@@ -1,0 +1,9 @@
+{
+  "test_mean": 0.5838363800048828,
+  "test_std": 0.0,
+  "seeds_done": 1,
+  "all_test": [
+    0.5838363800048828
+  ],
+  "epochs_trained": 76
+}
