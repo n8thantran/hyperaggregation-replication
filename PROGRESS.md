@@ -1,7 +1,7 @@
 # HyperAggregation Replication Progress
 
 ## Current Phase
-Running remaining experiments (ZINC is critical), then generating deliverables.
+Finishing ZINC experiment and generating deliverables (reproduce.sh, REPORT.md).
 
 ## Implementation Plan
 - [x] 1. Data pipeline (datasets.py): Load all datasets, handle splits - DONE, TESTED
@@ -12,10 +12,9 @@ Running remaining experiments (ZINC is critical), then generating deliverables.
 - [x] 6. Training pipeline (train.py) - DONE
 - [x] 7. Experiment runner (run_all.py) - DONE
 - [x] 8. Run transductive vertex-level experiments - DONE (16 results)
-- [ ] 9. Run ZINC graph-level experiment - PRIORITY
-- [ ] 10. Re-run Roman-Empire with more blocks (8-10) to try to close gap
-- [ ] 11. Generate result tables, REPORT.md, reproduce.sh
-- [ ] 12. Final git push
+- [ ] 9. Run ZINC graph-level experiment - IN PROGRESS (1 seed done: 0.535 MAE at 100 epochs, need more training)
+- [ ] 10. Generate result tables, REPORT.md, reproduce.sh
+- [ ] 11. Final git push
 
 ## Current Results vs Paper
 
@@ -40,7 +39,7 @@ Running remaining experiments (ZINC is critical), then generating deliverables.
 ### Table 3 (Graph-level):
 | Dataset | Paper GHC | My GHC | Status |
 |---------|-----------|--------|--------|
-| ZINC | 0.337±0.020 | NOT RUN | TODO |
+| ZINC | 0.337±0.020 | 0.535 (1 seed, 100ep) | IN PROGRESS - needs more training |
 
 ### Baselines:
 | Dataset | Paper GCN | My GCN | Paper MLP | My MLP |
@@ -68,14 +67,15 @@ Running remaining experiments (ZINC is critical), then generating deliverables.
 - models.py: HyperAggregation, HyperAggregationBatched, GHCBlock, GHC, GHMBlock, GHM, GCN, MLP
 - train.py: Training/eval loops, run_single_experiment, run_experiment (handles vertex+graph tasks)
 - run_all.py: All experiment configs and runner
+- run_zinc.py: ZINC-specific experiment script
 
 ## Failed Approaches
 - Roman-Empire: Tried depths 2-10, various weight decays, mix_dims, hidden_dims → plateau at ~86%
 - The gap to 92.27% likely requires some undisclosed architectural detail or hyperparameter
 - Chameleon GCN at 37% is wrong - likely using wrong splits or undirected config
+- ZINC: 100 epochs gives only 0.535 MAE. Need 300-500+ epochs. ~3s/epoch = 15-25 min per seed.
 
 ## Priority for Remaining Time
-1. ZINC experiment (key Table 3 result)
-2. Fix Chameleon GCN baseline  
-3. Try Roman-Empire with 8+ blocks
-4. Generate deliverables (reproduce.sh, REPORT.md, tables)
+1. Run ZINC for longer (300 ep, 3 seeds) - launch in background
+2. Generate deliverables (reproduce.sh, REPORT.md, all results tables)
+3. Final git push and end task
