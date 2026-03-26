@@ -1,52 +1,22 @@
 {
-  "test_mean": 0.852347334980586,
-  "test_std": 0.0013515135700018822,
-  "val_mean": 0.8631950573698146,
-  "val_std": 0.0017331597823313284,
-  "all_results": [
-    {
-      "train": 0.999823493072103,
-      "val": 0.8626654898499558,
-      "test": 0.8506883162725026,
-      "epochs_trained": 234
-    },
-    {
-      "train": 0.9992939722884123,
-      "val": 0.8610767872903795,
-      "test": 0.8510412989763502,
-      "epochs_trained": 219
-    },
-    {
-      "train": 0.9999117465360515,
-      "val": 0.8628420123565754,
-      "test": 0.854041651959054,
-      "epochs_trained": 271
-    },
-    {
-      "train": 0.9989409584326184,
-      "val": 0.863018534863195,
-      "test": 0.8536886692552065,
-      "epochs_trained": 184
-    },
-    {
-      "train": 0.999823493072103,
-      "val": 0.8663724624889674,
-      "test": 0.8522767384398164,
-      "epochs_trained": 220
-    }
-  ],
+  "name": "GHC_RomanEmpire",
+  "test_mean": 0.8577832686198377,
+  "test_std": 0.0018490364777562591,
+  "val_mean": 0.8675022065313328,
+  "val_std": 0.0026339145565534706,
+  "metric": "Accuracy",
+  "elapsed_seconds": 227.7472767829895,
   "config": {
-    "name": "GHC_RomanEmpire_trans",
     "dataset": "Roman-Empire",
     "model": "GHC",
-    "setting": "transductive",
     "task": "vertex",
+    "setting": "transductive",
     "hidden_dim": 256,
     "mix_dim": 32,
-    "num_blocks": 4,
     "dropout": 0.3,
     "input_dropout": 0.0,
     "mix_dropout": 0.1,
+    "num_blocks": 4,
     "mean_agg": false,
     "root_conn": true,
     "residual": true,
@@ -55,12 +25,43 @@
     "add_self_loop": false,
     "make_undirected": true,
     "normalize_input": true,
-    "input_activation": false,
     "lr": 0.001,
-    "weight_decay": 0,
+    "weight_decay": 0.0005,
     "epochs": 500,
-    "patience": 50,
+    "patience": 100,
     "num_seeds": 5,
     "num_splits": 1
-  }
+  },
+  "all_results": [
+    {
+      "train": 0.999823493072103,
+      "val": 0.8723742277140335,
+      "test": 0.8584539357571479,
+      "epochs_trained": 339
+    },
+    {
+      "train": 0.9997352396081546,
+      "val": 0.8653133274492498,
+      "test": 0.855453582774444,
+      "epochs_trained": 317
+    },
+    {
+      "train": 0.9999117465360515,
+      "val": 0.8681376875551633,
+      "test": 0.8609248146840804,
+      "epochs_trained": 447
+    },
+    {
+      "train": 0.999823493072103,
+      "val": 0.8661959399823478,
+      "test": 0.8566890222379103,
+      "epochs_trained": 414
+    },
+    {
+      "train": 0.9996469861442061,
+      "val": 0.8654898499558694,
+      "test": 0.8573949876456054,
+      "epochs_trained": 313
+    }
+  ]
 }
