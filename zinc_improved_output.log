@@ -5,4 +5,10 @@
 Config: h160_m128
   Split 0/1, Seed 0/3... Test: 0.4507 (1934.2s, 409 epochs)
   Split 0/1, Seed 1/3... Test: 0.4409 (2961.4s, 460 epochs)
-  Split 0/1, Seed 2/3... 
+  Split 0/1, Seed 2/3... Test: 0.4238 (2393.3s, 467 epochs)
+
+h160_m128: MAE = 0.4385 ± 0.0111
+
+============================================================
+Config: h160_m64
+  Split 0/1, Seed 0/3... 
