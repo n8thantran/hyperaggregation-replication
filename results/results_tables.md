@@ -1,33 +1,40 @@
-# Table 1: Homophilic Datasets (Transductive)
+# HyperAggregation Replication Results
 
-| Model           |            Cora |        CiteSeer |          PubMed |       Computers |           Photo |
-|-----------------|-----------------|-----------------|-----------------|-----------------|-----------------|
-| Paper GHC       |      78.85±2.14 |      66.82±1.66 |      76.31±2.71 |      82.12±1.91 |      91.63±0.79 |
-| Our GHC         |      80.00±1.80 |      67.16±1.33 |      73.97±1.59 |      80.44±0.74 |      91.33±0.64 |
-| Paper GCN       |      78.43±0.85 |      66.75±1.86 |      75.62±2.24 |      83.52±1.73 |      90.94±1.06 |
-| Our GCN         |      78.50±0.23 |      69.23±0.51 |      74.94±0.24 |             N/A |             N/A |
+Replication of 'HyperAggregation: Aggregating over Graph Edges with Hypernetworks'
 
-# Table 2: Heterophilic Datasets (Transductive)
+## Table 1: Homophilic Datasets (Transductive Vertex Classification)
 
-| Model           |       Chameleon |        Squirrel |           Actor |     Minesweeper |    Roman-Empire |
-|-----------------|-----------------|-----------------|-----------------|-----------------|-----------------|
-| Paper GHC       |      74.78±1.82 |      62.90±1.47 |      36.40±1.46 |      87.49±0.61 |      92.27±0.57 |
-| Our GHC         |      68.86±1.42 |      55.27±1.41 |      37.00±1.03 |      86.17±0.80 |      85.78±0.18 |
-| Paper GCN       |      69.63±2.41 |      59.56±1.92 |      33.70±1.26 |      88.72±0.52 |      82.72±0.82 |
+| Dataset | Paper GHC | Our GHC | Paper GCN | Our GCN |
+|---------|-----------|---------|-----------|---------|
+| Cora | 78.85±2.14 | 80.00±1.80 | 78.43±1.36 | 78.50±0.23 |
+| CiteSeer | 66.82±1.66 | 67.16±1.33 | 66.75±1.42 | 69.23±0.51 |
+| PubMed | 76.31±2.71 | 73.97±1.59 | 75.62±2.45 | 74.94±0.24 |
+| Computers | 82.12±1.91 | 80.44±0.74 | - | - |
+| Photo | 91.63±0.79 | 91.33±0.64 | - | - |
 
-# Table 3: Graph-Level Tasks (ZINC MAE ↓)
+## Table 2: Heterophilic Datasets (Transductive Vertex Classification)
 
-| Model           |        ZINC MAE |
-|-----------------|-----------------|
-| Paper GHC       |     0.337±0.020 |
-| Our GHC         |     0.448±0.022 |
+| Dataset | Paper GHC | Our GHC |
+|---------|-----------|---------|
+| Chameleon | 74.78±1.82 | 68.86±1.42 |
+| Squirrel | 62.90±1.47 | 55.27±1.41 |
+| Actor | 36.40±1.46 | 37.00±1.03 |
+| Minesweeper | 87.49±0.61 | 86.17±0.80 |
+| Roman-Empire | 92.27±0.57 | 85.78±0.18 |
 
-# Baselines
+## Table 3: Graph-Level Regression (ZINC)
 
-| Model      | Dataset      |           Paper |            Ours |
-|------------|--------------|-----------------|-----------------|
-| GCN        | Cora         |      78.43±0.85 |      78.50±0.23 |
-| GCN        | CiteSeer     |      66.75±1.86 |      69.23±0.51 |
-| GCN        | PubMed       |      75.62±2.24 |      74.94±0.24 |
-| MLP        | Cora         |      56.29±2.08 |      54.99±0.32 |
-| MLP        | Chameleon    |      45.57±1.77 |      49.05±1.44 |
+| Dataset | Paper GHC (MAE↓) | Our GHC (MAE↓) |
+|---------|------------------|-----------------|
+| ZINC | 0.337±0.020 | 0.448±0.022 |
+
+## Baselines
+
+| Dataset | Model | Paper | Ours |
+|---------|-------|-------|------|
+| Cora | GCN | 78.43±1.36 | 78.50±0.23 |
+| Cora | MLP | 56.29±1.82 | 54.99±0.32 |
+| CiteSeer | GCN | 66.75±1.42 | 69.23±0.51 |
+| PubMed | GCN | 75.62±2.45 | 74.94±0.24 |
+| Chameleon | GCN | 69.63±1.73 | 37.06±3.43 |
+| Chameleon | MLP | 45.57±2.07 | 49.05±1.44 |
