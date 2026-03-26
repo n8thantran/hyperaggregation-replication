@@ -1,7 +1,7 @@
 # HyperAggregation Replication Progress
 
 ## Current Phase
-Running ablation experiments (Table 5) and ZINC improved. Need to finalize deliverables.
+Finalizing deliverables. Ablation (5/7 done, 2 running) and ZINC improved (1/3 seeds done) still running in background. Need to write REPORT.md, test reproduce.sh, and finalize.
 
 ## Implementation Plan
 - [x] 1. Data pipeline (datasets.py): Load all datasets, handle splits
@@ -13,12 +13,12 @@ Running ablation experiments (Table 5) and ZINC improved. Need to finalize deliv
 - [x] 7. Experiment runner scripts (run_all.py, run_fast.py, run_reproduce.py)
 - [x] 8. Run transductive vertex-level experiments - ALL 10 datasets done
 - [x] 9. Run ZINC graph-level experiment - 3 seeds done (MAE ~0.449)
-- [x] 10. Run baselines (GCN on Cora/CiteSeer/PubMed/Chameleon, MLP on Cora/Chameleon)
-- [~] 11. Run ablation study (Table 5) - IN PROGRESS (2/7 done)
-- [~] 12. Run ZINC improved (h160_m128) - IN PROGRESS
-- [ ] 13. Generate final result tables (generate_tables.py)
+- [x] 10. Run baselines (GCN on Cora/CiteSeer/PubMed, MLP on Cora/Chameleon)
+- [~] 11. Run ablation study (Table 5) - 5/7 done, 2 running
+- [~] 12. Run ZINC improved (h160_m128) - 1/3 seeds done (MAE 0.4507)
+- [x] 13. Generate result tables (generate_tables.py)
 - [ ] 14. Write REPORT.md
-- [ ] 15. Write reproduce.sh
+- [ ] 15. Test reproduce.sh
 - [ ] 16. Final git push
 
 ## Current Results vs Paper
@@ -47,19 +47,24 @@ Running ablation experiments (Table 5) and ZINC improved. Need to finalize deliv
 | ZINC | 0.337±0.020 | 0.449±0.022 | ~0.11 gap |
 
 ### Baselines:
-| Dataset | Paper GCN | My GCN | Paper MLP | My MLP |
-|---------|-----------|--------|-----------|--------|
-| Cora | 78.43 | 78.50 ✓ | 56.29 | 54.99 ✓ |
-| CiteSeer | 66.75 | 69.23 | - | - |
-| PubMed | 75.62 | 74.94 ✓ | - | - |
-| Chameleon | 69.63 | 37.06 ⚠ | 45.57 | 49.05 |
+| Model | Dataset | Paper | Ours | Status |
+|-------|---------|-------|------|--------|
+| GCN | Cora | 78.43 | 78.50 | ✓ |
+| GCN | CiteSeer | 66.75 | 69.23 | ✓ |
+| GCN | PubMed | 75.62 | 74.94 | ✓ |
+| MLP | Cora | 56.29 | 54.99 | ✓ |
+| MLP | Chameleon | 45.57 | 49.05 | ~ |
 
-### Table 5 (Ablation - partial):
+### Table 5 (Ablation - 5/7 complete):
 | Ablation | Cora Δ (ours) | Paper Δ | RE Δ (ours) | Paper Δ |
 |----------|---------------|---------|-------------|---------|
 | Self-loops | -1.26 | -2.84 | -3.59 | -0.13 |
 | Normalize input | -1.75 | -0.66 | -2.75 | -0.01 |
-| (remaining 5 still running) | | | | |
+| Residual | +0.19 | -3.09 | -15.67 | -1.22 |
+| Root connection | -0.34 | -0.50 | -1.38 | -1.72 |
+| Mean aggregate | -4.00 | -1.35 | -1.42 | -2.64 |
+| Trans HA input | (running) | +0.47 | (running) | -1.15 |
+| Trans HA output | (running) | -4.83 | (running) | -0.08 |
 
 ## Key Architecture Details (from paper)
 ### HyperAggregation (Section 3.1)
@@ -68,46 +73,32 @@ Running ablation experiments (Table 5) and ZINC improved. Need to finalize deliv
 - Optional: LayerNorm+dropout before/after target network
 
 ### GHC Block: FF → HA(A) → FF with optional root_conn, residual
-### GHM Block: Sample k-hop neighborhood, FF → HA → FF (fully connected)
+### GHM Block: k-hop neighborhood sampling, per-vertex HA
 
-### Paper hyperparameters (from Section 4.2 and ablation table):
-**Cora**: hidden=256, mix=64, blocks=2, dropout=0.6, no residual, yes root_conn, yes mean_agg, self-loops=yes, trans_input=True, trans_output=True
-**Roman-Empire**: hidden=256, mix=32, blocks=4, dropout=0.3, residual=yes, root_conn=yes, mean_agg=no, normalize_input=yes, undirected=yes, trans_input=yes, trans_output=no, self-loops=no, mix_dropout=0.1
-**ZINC**: hidden=64, mix=64, blocks=4, dropout=0.0, residual=yes, root_conn=yes, mean_agg=yes, trans_input=yes, trans_output=yes, 500K param budget
-
-## Key Decisions
-- Using PyG for data loading and scatter operations
-- HyperAggregationBatched uses scatter_add for efficient per-neighborhood computation
-- Memory-efficient chunked computation for large graphs
-- For mean_agg=False: use root vertex's own W_tar to read from aggregated features
-
-## Completed Work
-- **datasets.py**: Loads Cora, CiteSeer, PubMed, Computers, Photo, Chameleon, Squirrel, Actor, Minesweeper, Roman-Empire, ZINC. Handles random splits for Cora/CiteSeer/PubMed/Computers/Photo.
-- **models.py**: HyperAggregation, HyperAggregationBatched, GHCBlock, GHC, GHMBlock, GHM, GCN, MLP. All tested.
-- **train.py**: Training pipeline with early stopping, supports vertex/graph tasks, transductive/inductive settings.
-- **run_reproduce.py**: Main experiment runner with all configs.
-- **run_ablation_fast.py**: Ablation study runner (Table 5).
-- **generate_tables.py**: Generates result tables from JSON files.
+## Key Files
+- models.py: HyperAggregation, HyperAggregationBatched, GHCBlock, GHC, GHM, GCN, MLP
+- datasets.py: Dataset loading for all 10 vertex datasets + ZINC
+- train.py: Training pipeline with run_experiment() function
+- run_reproduce.py: Main experiment runner with all configs
+- run_ablation_fast.py: Ablation study runner
+- generate_tables.py: Result table generator
+- reproduce.sh: Top-level reproduction script
 
 ## Failed Approaches
-1. **GCN on Chameleon**: Getting 37% instead of paper's 69.63%. The paper likely uses a different GCN implementation or split. Not critical for replication of HyperAggregation.
-2. **Roman-Empire gap**: 85.78% vs 92.27%. The gap may be due to undirected edge handling or the specific split used. The paper uses provided splits from the heterophilic benchmark.
-3. **Chameleon/Squirrel gap**: ~6-7% below paper. These datasets are known to be sensitive to splits and preprocessing. The paper uses specific splits from Platonov et al.
-4. **ZINC gap**: 0.449 vs 0.337. May need larger model or more training. Running h160_m128 config now.
+1. Initial Chameleon/Squirrel: Used wrong split convention (geom-gcn splits vs paper's random splits)
+2. Roman-Empire: Initially missed normalize_input=True and 4 blocks
+3. ZINC: h64_m32 config gives MAE ~0.449; h160_m128 not helping much (0.4507 so far)
+4. GCN Chameleon baseline: 37% vs paper 69% - likely split issue, not critical
+5. Residual ablation on RE: -15.67 vs paper -1.22 - our RE config relies heavily on residual
 
-## Running Processes
-- `run_ablation_fast.py` → ablation_output.log (2/7 ablations done)
-- `run_zinc_improved.py` → zinc_improved_output.log (1/3 seeds done for h160_m128)
-
-## Rubric Status
-- [x] HyperAggregation module implemented correctly
-- [x] GHC model implemented
-- [x] GHM model implemented  
-- [x] Baselines (GCN, MLP) implemented
-- [x] Table 1 results (5/5 datasets, most within ~2%)
-- [x] Table 2 results (5/5 datasets, some gaps on Chameleon/Squirrel/RE)
-- [x] Table 3 results (ZINC, gap exists)
-- [~] Table 5 ablation (in progress)
-- [ ] reproduce.sh finalized
-- [ ] REPORT.md written
-- [ ] Final commit pushed
+## Rubric Assessment
+- Core HyperAggregation implementation: DONE
+- GHC model with all options: DONE
+- GHM model: DONE (implemented, not extensively tested)
+- All 10 vertex datasets: DONE
+- ZINC graph-level: DONE (gap exists)
+- Baselines: DONE (GCN, MLP)
+- Ablation study: MOSTLY DONE (5/7, 2 running)
+- reproduce.sh: NEEDS TESTING
+- REPORT.md: NOT WRITTEN YET
+- Results directory: HAS RESULTS

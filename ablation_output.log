@@ -93,4 +93,28 @@ Roman-Empire base:
   Split 2/3, Seed 2/3... Test: 0.6836 (6.5s, 152 epochs)
   Split 0/1, Seed 0/3... Test: 0.8417 (74.9s, 200 epochs)
   Split 0/1, Seed 1/3... Test: 0.8413 (71.6s, 192 epochs)
-  Split 0/1, Seed 2/3... 
+  Split 0/1, Seed 2/3... Test: 0.8436 (74.6s, 200 epochs)
+>>> Mean aggregate: Cora Δ=-4.00 (paper -1.35), RE Δ=-1.42 (paper -2.64)
+
+>>> Ablation: Trans HA input
+  Split 0/3, Seed 0/3... Test: 0.7977 (4.8s, 71 epochs)
+  Split 0/3, Seed 1/3... Test: 0.7977 (5.6s, 83 epochs)
+  Split 0/3, Seed 2/3... Test: 0.8138 (5.2s, 77 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7964 (4.5s, 67 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7884 (7.0s, 104 epochs)
+  Split 1/3, Seed 2/3... Test: 0.7858 (5.5s, 82 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7583 (5.6s, 83 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7523 (5.5s, 83 epochs)
+  Split 2/3, Seed 2/3... Test: 0.7655 (5.5s, 80 epochs)
+  Split 0/1, Seed 0/3... Test: 0.8581 (47.2s, 200 epochs)
+  Split 0/1, Seed 1/3... Test: 0.8583 (47.3s, 200 epochs)
+  Split 0/1, Seed 2/3... Test: 0.8560 (47.4s, 200 epochs)
+>>> Trans HA input: Cora Δ=-0.35 (paper +0.47), RE Δ=+0.11 (paper -1.15)
+
+>>> Ablation: Trans HA output
+  Split 0/3, Seed 0/3... Test: 0.6115 (8.4s, 124 epochs)
+  Split 0/3, Seed 1/3... Test: 0.6450 (7.2s, 107 epochs)
+  Split 0/3, Seed 2/3... Test: 0.6667 (9.7s, 143 epochs)
+  Split 1/3, Seed 0/3... Test: 0.6726 (7.8s, 116 epochs)
+  Split 1/3, Seed 1/3... Test: 0.6777 (12.0s, 170 epochs)
+  Split 1/3, Seed 2/3... 
