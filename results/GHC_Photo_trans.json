@@ -1,0 +1,65 @@
+{
+  "test_mean": 0.9133241379310345,
+  "test_std": 0.00644514399326622,
+  "val_mean": 0.9441666666666666,
+  "val_std": 0.0033333333333333214,
+  "all_results": [
+    {
+      "train": 0.99375,
+      "val": 0.9416666666666667,
+      "test": 0.9053793103448275,
+      "epochs_trained": 149
+    },
+    {
+      "train": 0.9875,
+      "val": 0.9458333333333333,
+      "test": 0.9086896551724138,
+      "epochs_trained": 124
+    },
+    {
+      "train": 1.0,
+      "val": 0.9416666666666667,
+      "test": 0.9126896551724137,
+      "epochs_trained": 161
+    },
+    {
+      "train": 0.9875,
+      "val": 0.9416666666666667,
+      "test": 0.9157241379310345,
+      "epochs_trained": 134
+    },
+    {
+      "train": 0.99375,
+      "val": 0.95,
+      "test": 0.9241379310344827,
+      "epochs_trained": 182
+    }
+  ],
+  "config": {
+    "name": "GHC_Photo_trans",
+    "dataset": "Photo",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 128,
+    "mix_dim": 32,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "normalize_input": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 5,
+    "num_splits": 1
+  }
+}

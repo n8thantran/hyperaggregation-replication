@@ -1,0 +1,95 @@
+{
+  "test_mean": 0.7334236214033831,
+  "test_std": 0.01608698472221905,
+  "val_mean": 0.8022222222222222,
+  "val_std": 0.008314794192830988,
+  "all_results": [
+    {
+      "train": 1.0,
+      "val": 0.8111111111111111,
+      "test": 0.7186589666274851,
+      "epochs_trained": 164
+    },
+    {
+      "train": 1.0,
+      "val": 0.7888888888888889,
+      "test": 0.749833904022078,
+      "epochs_trained": 151
+    },
+    {
+      "train": 1.0,
+      "val": 0.8111111111111111,
+      "test": 0.7464608780088925,
+      "epochs_trained": 222
+    },
+    {
+      "train": 1.0,
+      "val": 0.8111111111111111,
+      "test": 0.7095620176828333,
+      "epochs_trained": 241
+    },
+    {
+      "train": 0.9333333333333333,
+      "val": 0.8,
+      "test": 0.7201410538150969,
+      "epochs_trained": 143
+    },
+    {
+      "train": 0.9833333333333333,
+      "val": 0.7888888888888889,
+      "test": 0.7544334849491491,
+      "epochs_trained": 149
+    },
+    {
+      "train": 1.0,
+      "val": 0.8,
+      "test": 0.7204987989983135,
+      "epochs_trained": 167
+    },
+    {
+      "train": 1.0,
+      "val": 0.8,
+      "test": 0.7254561251086012,
+      "epochs_trained": 171
+    },
+    {
+      "train": 1.0,
+      "val": 0.8,
+      "test": 0.7560688915009965,
+      "epochs_trained": 199
+    },
+    {
+      "train": 1.0,
+      "val": 0.8111111111111111,
+      "test": 0.7331220933203864,
+      "epochs_trained": 153
+    }
+  ],
+  "config": {
+    "task": "vertex",
+    "epochs": 500,
+    "patience": 100,
+    "num_seeds": 10,
+    "num_splits": 1,
+    "name": "GHC_PubMed_trans",
+    "dataset": "PubMed",
+    "model": "GHC",
+    "setting": "transductive",
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "normalize_input": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "test_mean": 0.6885964912280702,
+  "test_std": 0.014249699334516025,
+  "val_mean": 0.6851089772900473,
+  "val_std": 0.037096888709834,
+  "all_results": [
+    {
+      "train": 0.934981684981685,
+      "val": 0.7283950617283951,
+      "test": 0.6842105263157895,
+      "epochs_trained": 224
+    },
+    {
+      "train": 0.9304029304029304,
+      "val": 0.7187928669410151,
+      "test": 0.6973684210526315,
+      "epochs_trained": 213
+    },
+    {
+      "train": 0.978021978021978,
+      "val": 0.720164609053498,
+      "test": 0.6907894736842105,
+      "epochs_trained": 280
+    },
+    {
+      "train": 0.9734432234432234,
+      "val": 0.6172839506172839,
+      "test": 0.6907894736842105,
+      "epochs_trained": 242
+    },
+    {
+      "train": 0.9468864468864469,
+      "val": 0.6515775034293553,
+      "test": 0.7149122807017544,
+      "epochs_trained": 223
+    },
+    {
+      "train": 0.8864468864468864,
+      "val": 0.6406035665294925,
+      "test": 0.6885964912280702,
+      "epochs_trained": 184
+    },
+    {
+      "train": 0.902014652014652,
+      "val": 0.691358024691358,
+      "test": 0.6600877192982456,
+      "epochs_trained": 199
+    },
+    {
+      "train": 0.858058608058608,
+      "val": 0.6954732510288066,
+      "test": 0.6754385964912281,
+      "epochs_trained": 177
+    },
+    {
+      "train": 0.9340659340659341,
+      "val": 0.7023319615912208,
+      "test": 0.6951754385964912,
+      "epochs_trained": 209
+    }
+  ],
+  "config": {
+    "name": "GHC_Chameleon_trans",
+    "dataset": "Chameleon",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": true,
+    "normalize_input": false,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0,
+    "epochs": 500,
+    "patience": 100,
+    "num_seeds": 3,
+    "num_splits": 3
+  }
+}

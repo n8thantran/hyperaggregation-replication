@@ -1,0 +1,53 @@
+{
+  "test_mean": 0.8044068819800785,
+  "test_std": 0.007363472366717751,
+  "val_mean": 0.8933333333333332,
+  "val_std": 0.002721655269759059,
+  "all_results": [
+    {
+      "train": 0.98,
+      "val": 0.8933333333333333,
+      "test": 0.8096136432236644,
+      "epochs_trained": 139
+    },
+    {
+      "train": 0.99,
+      "val": 0.89,
+      "test": 0.7939933594929067,
+      "epochs_trained": 182
+    },
+    {
+      "train": 0.98,
+      "val": 0.8966666666666666,
+      "test": 0.8096136432236644,
+      "epochs_trained": 189
+    }
+  ],
+  "config": {
+    "name": "GHC_Computers_trans",
+    "dataset": "Computers",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 128,
+    "mix_dim": 32,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "normalize_input": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1
+  }
+}
