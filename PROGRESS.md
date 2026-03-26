@@ -1,18 +1,18 @@
 # HyperAggregation Replication Progress
 
 ## Current Phase
-Finishing ZINC experiment and generating deliverables (reproduce.sh, REPORT.md).
+Creating final deliverables (reproduce.sh, REPORT.md, result tables). ZINC running in background.
 
 ## Implementation Plan
 - [x] 1. Data pipeline (datasets.py): Load all datasets, handle splits - DONE, TESTED
-- [x] 2. HyperAggregation module (in models.py) - DONE, VERIFIED
+- [x] 2. HyperAggregation module (in models.py) - DONE, VERIFIED (exact match with non-batched version)
 - [x] 3. GHC model (in models.py) - DONE
 - [x] 4. GHM model (in models.py) - DONE
 - [x] 5. Baseline models GCN, MLP (in models.py) - DONE
 - [x] 6. Training pipeline (train.py) - DONE
 - [x] 7. Experiment runner (run_all.py) - DONE
 - [x] 8. Run transductive vertex-level experiments - DONE (16 results)
-- [ ] 9. Run ZINC graph-level experiment - IN PROGRESS (1 seed done: 0.535 MAE at 100 epochs, need more training)
+- [x] 9. Run ZINC graph-level experiment - Seed 0: 0.468 MAE, Seed 1 in progress
 - [ ] 10. Generate result tables, REPORT.md, reproduce.sh
 - [ ] 11. Final git push
 
@@ -39,7 +39,7 @@ Finishing ZINC experiment and generating deliverables (reproduce.sh, REPORT.md).
 ### Table 3 (Graph-level):
 | Dataset | Paper GHC | My GHC | Status |
 |---------|-----------|--------|--------|
-| ZINC | 0.337±0.020 | 0.535 (1 seed, 100ep) | IN PROGRESS - needs more training |
+| ZINC | 0.337±0.020 | 0.468 (seed 0, 358ep) | ~0.13 gap, seed 1 running |
 
 ### Baselines:
 | Dataset | Paper GCN | My GCN | Paper MLP | My MLP |
@@ -47,7 +47,7 @@ Finishing ZINC experiment and generating deliverables (reproduce.sh, REPORT.md).
 | Cora | 78.43 | 78.50 ✓ | 56.29 | 54.99 ✓ |
 | CiteSeer | 66.75 | 69.23 | - | - |
 | PubMed | 75.62 | 74.94 ✓ | - | - |
-| Chameleon | 69.63 | 37.06 ⚠ WRONG | 45.57 | 49.05 |
+| Chameleon | 69.63 | 37.06 ⚠ | 45.57 | 49.05 |
 
 ## Key Architecture Details (from paper)
 ### HyperAggregation (Section 3.1)
@@ -67,15 +67,31 @@ Finishing ZINC experiment and generating deliverables (reproduce.sh, REPORT.md).
 - models.py: HyperAggregation, HyperAggregationBatched, GHCBlock, GHC, GHMBlock, GHM, GCN, MLP
 - train.py: Training/eval loops, run_single_experiment, run_experiment (handles vertex+graph tasks)
 - run_all.py: All experiment configs and runner
-- run_zinc.py: ZINC-specific experiment script
+- run_zinc_quick.py: ZINC-specific experiment script (running in background)
+- generate_tables.py: Generate result tables from JSON files
 
-## Failed Approaches
-- Roman-Empire: Tried depths 2-10, various weight decays, mix_dims, hidden_dims → plateau at ~86%
-- The gap to 92.27% likely requires some undisclosed architectural detail or hyperparameter
-- Chameleon GCN at 37% is wrong - likely using wrong splits or undirected config
-- ZINC: 100 epochs gives only 0.535 MAE. Need 300-500+ epochs. ~3s/epoch = 15-25 min per seed.
+## Verified Correctness
+- HyperAggregationBatched matches HyperAggregation exactly (both mean_agg and root readout with self-loops)
+- GCN baseline matches paper on Cora, PubMed
+- MLP baseline matches paper on Cora
 
-## Priority for Remaining Time
-1. Run ZINC for longer (300 ep, 3 seeds) - launch in background
-2. Generate deliverables (reproduce.sh, REPORT.md, all results tables)
-3. Final git push and end task
+## Failed Approaches / Known Gaps
+- Roman-Empire: ~6% gap. Tried depths 2-10, various weight decays, mix_dims. The gap may be due to:
+  - Different split handling (paper uses 10 splits × 10 seeds = 100 runs)
+  - Possible undisclosed architectural details
+  - My mean_agg=False implementation without self-loops differs from paper's approach
+- Chameleon/Squirrel: ~6-7% gap. These use filtered splits from the paper which may differ
+- Chameleon GCN baseline at 37% is wrong (paper: 69.63%) - likely wrong split or undirected config
+- ZINC: 0.468 vs paper 0.337 - may need edge features, different LR schedule, or longer training
+
+## Rubric Status
+- [x] Core method (HyperAggregation) implemented correctly
+- [x] GHC model implemented
+- [x] GHM model implemented  
+- [x] Baselines (GCN, MLP) implemented
+- [x] All 10 transductive datasets attempted (5 homophilic + 5 heterophilic)
+- [x] ZINC graph-level experiment running
+- [x] Results close on 7/10 transductive datasets
+- [ ] reproduce.sh - TODO
+- [ ] REPORT.md - TODO
+- [ ] Final result tables - TODO

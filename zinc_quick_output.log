@@ -14,3 +14,25 @@ Parameters: 1,125,633
   Epoch 175: train=0.4246, val=0.4881, best_val=0.4565, lr=0.000500, time=527s
   Epoch 200: train=0.4018, val=0.4680, best_val=0.4543, lr=0.000500, time=603s
   Epoch 225: train=0.3956, val=0.4609, best_val=0.4487, lr=0.000500, time=678s
+  Epoch 250: train=0.3519, val=0.4423, best_val=0.4423, lr=0.000250, time=757s
+  Epoch 275: train=0.3367, val=0.4598, best_val=0.4423, lr=0.000250, time=916s
+  Epoch 300: train=0.3255, val=0.4491, best_val=0.4415, lr=0.000250, time=1050s
+  Epoch 325: train=0.2839, val=0.4496, best_val=0.4415, lr=0.000125, time=1125s
+  Epoch 350: train=0.2596, val=0.4487, best_val=0.4415, lr=0.000063, time=1200s
+  Early stopping at epoch 358
+  Seed 0: test_mae=0.4680, best_val=0.4415, epochs=358, time=1224.8s
+
+--- Seed 1 ---
+Parameters: 1,125,633
+  Epoch 25: train=0.5627, val=0.5821, best_val=0.5814, lr=0.001000, time=75s
+  Epoch 50: train=0.6153, val=0.5969, best_val=0.5611, lr=0.001000, time=150s
+  Epoch 75: train=0.5291, val=0.5585, best_val=0.5336, lr=0.001000, time=225s
+  Epoch 100: train=0.4886, val=0.5051, best_val=0.5051, lr=0.001000, time=301s
+  Epoch 125: train=0.4818, val=0.4903, best_val=0.4805, lr=0.001000, time=376s
+  Epoch 150: train=0.4549, val=0.4691, best_val=0.4691, lr=0.001000, time=451s
+  Epoch 175: train=0.4289, val=0.4646, best_val=0.4617, lr=0.001000, time=526s
+  Epoch 200: train=0.4516, val=0.4733, best_val=0.4598, lr=0.001000, time=601s
+  Epoch 225: train=0.4550, val=0.4601, best_val=0.4476, lr=0.001000, time=676s
+  Epoch 250: train=0.3858, val=0.4383, best_val=0.4383, lr=0.001000, time=751s
+  Epoch 275: train=0.3803, val=0.4580, best_val=0.4285, lr=0.001000, time=826s
+  Epoch 300: train=0.3526, val=0.4339, best_val=0.4235, lr=0.001000, time=901s
