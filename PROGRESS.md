@@ -1,7 +1,7 @@
 # HyperAggregation Replication Progress
 
 ## Current Phase
-Running experiments across all datasets to reproduce Tables 1, 2, 3 from paper.
+Running remaining experiments (ZINC is critical), then generating deliverables.
 
 ## Implementation Plan
 - [x] 1. Data pipeline (datasets.py): Load all datasets, handle splits - DONE, TESTED
@@ -11,19 +11,44 @@ Running experiments across all datasets to reproduce Tables 1, 2, 3 from paper.
 - [x] 5. Baseline models GCN, MLP (in models.py) - DONE
 - [x] 6. Training pipeline (train.py) - DONE
 - [x] 7. Experiment runner (run_all.py) - DONE
-- [ ] 8. Run all key experiments
-- [ ] 9. Results collection, tables, REPORT.md
-- [ ] 10. reproduce.sh
+- [x] 8. Run transductive vertex-level experiments - DONE (16 results)
+- [ ] 9. Run ZINC graph-level experiment - PRIORITY
+- [ ] 10. Re-run Roman-Empire with more blocks (8-10) to try to close gap
+- [ ] 11. Generate result tables, REPORT.md, reproduce.sh
+- [ ] 12. Final git push
 
-## Key Results So Far
-- GHC Cora transductive: 78.01 ± 1.88 (paper: 78.85 ± 2.14) ✓ CLOSE
-- GHC Roman-Empire transductive: 85.74 ± 0.17 (paper: 92.27 ± 0.57) - GAP (accepted, move on)
+## Current Results vs Paper
 
-## Roman-Empire Investigation
-- Tried: depths 2-10, weight_decay (0, 1e-4, 5e-4, 1e-3), various dropout, mix_dim, hidden_dim
-- Best: blocks=10 gives ~86.7%, blocks=4 gives ~85.7%
-- DECISION: Accept ~86% gap. The paper's 92.27% likely requires undisclosed architectural details.
-- Moving on to maximize dataset coverage.
+### Table 1 (Homophilic, transductive):
+| Dataset | Paper GHC | My GHC | Status |
+|---------|-----------|--------|--------|
+| Cora | 78.85±2.14 | 78.01±1.88 | ✓ Close |
+| CiteSeer | 66.82±1.66 | 67.16±1.33 | ✓ Close |
+| PubMed | 76.31±2.71 | 73.34±1.61 | ~3% gap |
+| Computers | 82.12±1.91 | 80.44±0.74 | ~2% gap |
+| Photo | 91.63±0.79 | 91.33±0.64 | ✓ Close |
+
+### Table 2 (Heterophilic, transductive):
+| Dataset | Paper GHC | My GHC | Status |
+|---------|-----------|--------|--------|
+| Chameleon | 74.78±1.82 | 68.86±1.42 | ~6% gap |
+| Squirrel | 62.90±1.47 | 55.27±1.41 | ~7% gap |
+| Actor | 36.40±1.46 | 37.00±1.03 | ✓ Close |
+| Minesweeper | 87.49±0.61 | 86.17±0.80 | ✓ Close |
+| Roman-Empire | 92.27±0.57 | 85.72±0.10 | ~6% gap |
+
+### Table 3 (Graph-level):
+| Dataset | Paper GHC | My GHC | Status |
+|---------|-----------|--------|--------|
+| ZINC | 0.337±0.020 | NOT RUN | TODO |
+
+### Baselines:
+| Dataset | Paper GCN | My GCN | Paper MLP | My MLP |
+|---------|-----------|--------|-----------|--------|
+| Cora | 78.43 | 78.50 ✓ | 56.29 | 54.99 ✓ |
+| CiteSeer | 66.75 | 69.23 | - | - |
+| PubMed | 75.62 | 74.94 ✓ | - | - |
+| Chameleon | 69.63 | 37.06 ⚠ WRONG | 45.57 | 49.05 |
 
 ## Key Architecture Details (from paper)
 ### HyperAggregation (Section 3.1)
@@ -34,25 +59,23 @@ Running experiments across all datasets to reproduce Tables 1, 2, 3 from paper.
 ### GHC Block: FF → HA(A) → FF with optional root_conn, residual
 ### GHM Block: Sample k-hop neighborhood, FF → HA → FF (fully connected)
 
-### Key paper results to reproduce:
-**Table 1 (Homophilic, transductive):**
-- Cora: GHC=78.85, GCN=78.43, MLP=56.29
-- CiteSeer: GHC=66.82
-- PubMed: GHC=76.31
-- Computers: GHC=82.12
-- Photo: GHC=91.63
-**Table 2 (Heterophilic, transductive):**  
-- Chameleon: GHC=74.78, Squirrel: GHC=62.90, Actor: GHC=36.40
-- Minesweeper: GHC=87.49, Roman-Empire: GHC=92.27
-**Table 3 (Graph-level):**
-- ZINC: GHC=0.337
+### Paper hyperparameters (from Section 4.2 and ablation table):
+**Cora**: hidden=256, mix=64, blocks=2, dropout=0.6, no residual, yes root_conn, yes mean_agg, self-loops=yes, trans_output=yes
+**Roman-Empire**: hidden=256, mix=32, blocks=4, dropout=0.3, residual=yes, root_conn=yes, mean_agg=no, normalize_input=yes, undirected=yes, trans_input=yes, no self-loops
 
 ## Files
-- datasets.py: All dataset loading
+- datasets.py: All dataset loading (Planetoid, Amazon, WikipediaNetwork, HeterophilousGraph, ZINC, GNNBenchmark)
 - models.py: HyperAggregation, HyperAggregationBatched, GHCBlock, GHC, GHMBlock, GHM, GCN, MLP
-- train.py: Training/eval loops, run_single_experiment, run_experiment
+- train.py: Training/eval loops, run_single_experiment, run_experiment (handles vertex+graph tasks)
 - run_all.py: All experiment configs and runner
 
 ## Failed Approaches
 - Roman-Empire: Tried depths 2-10, various weight decays, mix_dims, hidden_dims → plateau at ~86%
-- The gap to 92.27% likely requires some undisclosed architectural detail
+- The gap to 92.27% likely requires some undisclosed architectural detail or hyperparameter
+- Chameleon GCN at 37% is wrong - likely using wrong splits or undirected config
+
+## Priority for Remaining Time
+1. ZINC experiment (key Table 3 result)
+2. Fix Chameleon GCN baseline  
+3. Try Roman-Empire with 8+ blocks
+4. Generate deliverables (reproduce.sh, REPORT.md, tables)
