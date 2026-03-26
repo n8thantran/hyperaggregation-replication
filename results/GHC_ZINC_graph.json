@@ -1,9 +1,10 @@
 {
-  "test_mean": 0.5838363800048828,
-  "test_std": 0.0,
-  "seeds_done": 1,
+  "test_mean": 0.44295,
+  "test_std": 0.025050000000000017,
+  "seeds_done": 2,
   "all_test": [
-    0.5838363800048828
+    0.468,
+    0.4179
   ],
-  "epochs_trained": 76
+  "note": "Seed 2 still running"
 }
