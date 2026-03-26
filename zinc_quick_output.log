@@ -1,0 +1,16 @@
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+Loading ZINC dataset...
+ZINC: Train=10000, Val=1000, Test=1000
+
+--- Seed 0 ---
+Parameters: 1,125,633
+  Epoch 25: train=0.6879, val=0.6171, best_val=0.5431, lr=0.001000, time=76s
+  Epoch 50: train=0.5175, val=0.5253, best_val=0.5253, lr=0.000500, time=152s
+  Epoch 75: train=0.4741, val=0.4907, best_val=0.4865, lr=0.000500, time=227s
+  Epoch 100: train=0.4500, val=0.4818, best_val=0.4773, lr=0.000500, time=302s
+  Epoch 125: train=0.4831, val=0.5299, best_val=0.4669, lr=0.000500, time=377s
+  Epoch 150: train=0.4233, val=0.4659, best_val=0.4650, lr=0.000500, time=452s
+  Epoch 175: train=0.4246, val=0.4881, best_val=0.4565, lr=0.000500, time=527s
+  Epoch 200: train=0.4018, val=0.4680, best_val=0.4543, lr=0.000500, time=603s
+  Epoch 225: train=0.3956, val=0.4609, best_val=0.4487, lr=0.000500, time=678s

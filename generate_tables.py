@@ -1,133 +1,125 @@
 #!/usr/bin/env python3
-"""Generate result tables from saved JSON files."""
+"""Generate result tables from saved JSON results."""
 import json
 import os
-import numpy as np
+import glob
 
 results_dir = 'results'
 
 def load_result(filename):
-    """Load a result JSON file, return (mean, std) or None."""
     path = os.path.join(results_dir, filename)
     if os.path.exists(path):
         with open(path) as f:
-            d = json.load(f)
-        return d.get('test_mean'), d.get('test_std')
-    return None, None
+            return json.load(f)
+    return None
 
-def fmt(mean, std, multiply=100, decimals=2):
-    """Format mean ± std."""
-    if mean is None:
-        return "N/A"
-    if multiply:
-        mean *= multiply
-        std *= multiply
-    return f"{mean:.{decimals}f}±{std:.{decimals}f}"
+def fmt(mean, std, pct=True):
+    if pct:
+        return f"{mean*100:.2f} ± {std*100:.2f}"
+    else:
+        return f"{mean:.3f} ± {std:.3f}"
 
 print("=" * 80)
-print("TABLE 1: Homophilic Datasets (Transductive, Accuracy %)")
+print("TABLE 1: Homophilic Datasets (Transductive Vertex Classification)")
 print("=" * 80)
+print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20} {'Paper GCN':<20} {'Our GCN':<20}")
+print("-" * 95)
 
-homo_datasets = ['Cora', 'CiteSeer', 'PubMed', 'Computers', 'Photo']
-paper_ghc_homo = {
-    'Cora': (78.85, 2.14), 'CiteSeer': (66.82, 1.66), 'PubMed': (76.31, 2.71),
-    'Computers': (82.12, 1.91), 'Photo': (91.63, 0.79)
-}
+table1_datasets = [
+    ('Cora', '78.85 ± 2.14', '78.43 ± 1.35'),
+    ('CiteSeer', '66.82 ± 1.66', '66.75 ± 1.89'),
+    ('PubMed', '76.31 ± 2.71', '75.62 ± 2.28'),
+    ('Computers', '82.12 ± 1.91', '80.72 ± 1.79'),
+    ('Photo', '91.63 ± 0.79', '91.16 ± 0.83'),
+]
 
-print(f"{'Dataset':<12} {'Paper GHC':<18} {'My GHC':<18}")
-print("-" * 50)
-for ds in homo_datasets:
-    pm, ps = paper_ghc_homo[ds]
-    m, s = load_result(f'GHC_{ds}_trans.json')
-    paper_str = f"{pm:.2f}±{ps:.2f}"
-    my_str = fmt(m, s)
-    print(f"{ds:<12} {paper_str:<18} {my_str:<18}")
+for ds, paper_ghc, paper_gcn in table1_datasets:
+    ghc = load_result(f'GHC_{ds}_trans.json')
+    gcn = load_result(f'GCN_{ds}_trans.json')
+    
+    our_ghc = fmt(ghc['test_mean'], ghc['test_std']) if ghc else 'N/A'
+    our_gcn = fmt(gcn['test_mean'], gcn['test_std']) if gcn else 'N/A'
+    
+    print(f"{ds:<15} {paper_ghc:<20} {our_ghc:<20} {paper_gcn:<20} {our_gcn:<20}")
 
 print()
 print("=" * 80)
-print("TABLE 2: Heterophilic Datasets (Transductive, Accuracy %)")  
+print("TABLE 2: Heterophilic Datasets (Transductive Vertex Classification)")
 print("=" * 80)
+print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20}")
+print("-" * 55)
 
-hetero_datasets = ['Chameleon', 'Squirrel', 'Actor', 'Minesweeper', 'RomanEmpire']
-paper_ghc_hetero = {
-    'Chameleon': (74.78, 1.82), 'Squirrel': (62.90, 1.47), 'Actor': (36.40, 1.46),
-    'Minesweeper': (87.49, 0.61), 'RomanEmpire': (92.27, 0.57)
-}
+table2_datasets = [
+    ('Chameleon', '74.78 ± 1.82'),
+    ('Squirrel', '62.90 ± 1.47'),
+    ('Actor', '36.40 ± 1.46'),
+    ('Minesweeper', '87.49 ± 0.61'),
+    ('RomanEmpire', '92.27 ± 0.57'),
+]
 
-print(f"{'Dataset':<14} {'Paper GHC':<18} {'My GHC':<18}")
-print("-" * 50)
-for ds in hetero_datasets:
-    pm, ps = paper_ghc_hetero[ds]
-    m, s = load_result(f'GHC_{ds}_trans.json')
-    paper_str = f"{pm:.2f}±{ps:.2f}"
-    my_str = fmt(m, s)
-    print(f"{ds:<14} {paper_str:<18} {my_str:<18}")
+for ds, paper_ghc in table2_datasets:
+    ghc = load_result(f'GHC_{ds}_trans.json')
+    our_ghc = fmt(ghc['test_mean'], ghc['test_std']) if ghc else 'N/A'
+    print(f"{ds:<15} {paper_ghc:<20} {our_ghc:<20}")
 
 print()
 print("=" * 80)
-print("TABLE 3: Graph-Level Tasks")
+print("TABLE 3: Graph-Level Regression (ZINC)")
 print("=" * 80)
+print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20}")
+print("-" * 55)
 
-m, s = load_result('GHC_ZINC_graph.json')
-if m is not None:
-    print(f"ZINC GHC (MAE): Paper = 0.337±0.020, Mine = {fmt(m, s, multiply=None, decimals=3)}")
+zinc = load_result('GHC_ZINC_graph.json')
+if zinc:
+    our_zinc = fmt(zinc['test_mean'], zinc['test_std'], pct=False)
 else:
-    print("ZINC result not yet available")
+    our_zinc = 'N/A'
+print(f"{'ZINC':<15} {'0.337 ± 0.020':<20} {our_zinc:<20}")
 
 print()
 print("=" * 80)
 print("BASELINES")
 print("=" * 80)
+for f in sorted(glob.glob(os.path.join(results_dir, '*.json'))):
+    name = os.path.basename(f).replace('.json', '')
+    r = load_result(os.path.basename(f))
+    if r and 'test_mean' in r:
+        print(f"  {name}: {r['test_mean']:.4f} ± {r.get('test_std', 0):.4f}")
 
-baselines = [
-    ('GCN_Cora_trans.json', 'GCN Cora', (78.43, 0.85)),
-    ('GCN_CiteSeer_trans.json', 'GCN CiteSeer', (66.75, 1.86)),
-    ('GCN_PubMed_trans.json', 'GCN PubMed', (75.62, 2.24)),
-    ('GCN_Chameleon_trans.json', 'GCN Chameleon', (69.63, 2.41)),
-    ('MLP_Cora_trans.json', 'MLP Cora', (56.29, 2.08)),
-    ('MLP_Chameleon_trans.json', 'MLP Chameleon', (45.57, 1.77)),
-]
+# Also write markdown version
+with open('results/results_tables.md', 'w') as out:
+    out.write("# Replication Results\n\n")
+    
+    out.write("## Table 1: Homophilic Datasets (Transductive)\n\n")
+    out.write("| Dataset | Paper GHC | Our GHC | Paper GCN | Our GCN |\n")
+    out.write("|---------|-----------|---------|-----------|----------|\n")
+    for ds, paper_ghc, paper_gcn in table1_datasets:
+        ghc = load_result(f'GHC_{ds}_trans.json')
+        gcn = load_result(f'GCN_{ds}_trans.json')
+        our_ghc = fmt(ghc['test_mean'], ghc['test_std']) if ghc else 'N/A'
+        our_gcn = fmt(gcn['test_mean'], gcn['test_std']) if gcn else 'N/A'
+        out.write(f"| {ds} | {paper_ghc} | {our_ghc} | {paper_gcn} | {our_gcn} |\n")
+    
+    out.write("\n## Table 2: Heterophilic Datasets (Transductive)\n\n")
+    out.write("| Dataset | Paper GHC | Our GHC |\n")
+    out.write("|---------|-----------|----------|\n")
+    for ds, paper_ghc in table2_datasets:
+        ghc = load_result(f'GHC_{ds}_trans.json')
+        our_ghc = fmt(ghc['test_mean'], ghc['test_std']) if ghc else 'N/A'
+        out.write(f"| {ds} | {paper_ghc} | {our_ghc} |\n")
+    
+    out.write("\n## Table 3: Graph-Level (ZINC)\n\n")
+    out.write("| Dataset | Paper GHC (MAE↓) | Our GHC (MAE↓) |\n")
+    out.write("|---------|------------------|------------------|\n")
+    zinc = load_result('GHC_ZINC_graph.json')
+    our_zinc = fmt(zinc['test_mean'], zinc['test_std'], pct=False) if zinc else 'N/A'
+    out.write(f"| ZINC | 0.337 ± 0.020 | {our_zinc} |\n")
+    
+    out.write("\n## All Results\n\n")
+    for f in sorted(glob.glob(os.path.join(results_dir, '*.json'))):
+        name = os.path.basename(f).replace('.json', '')
+        r = load_result(os.path.basename(f))
+        if r and 'test_mean' in r:
+            out.write(f"- **{name}**: {r['test_mean']:.4f} ± {r.get('test_std', 0):.4f}\n")
 
-print(f"{'Model/Dataset':<20} {'Paper':<18} {'Mine':<18}")
-print("-" * 56)
-for fname, label, (pm, ps) in baselines:
-    m, s = load_result(fname)
-    paper_str = f"{pm:.2f}±{ps:.2f}"
-    my_str = fmt(m, s)
-    print(f"{label:<20} {paper_str:<18} {my_str:<18}")
-
-# Save markdown version
-with open('results/results_tables.md', 'w') as f:
-    f.write("# Replication Results\n\n")
-    
-    f.write("## Table 1: Homophilic Datasets (Transductive, Accuracy %)\n\n")
-    f.write("| Dataset | Paper GHC | My GHC |\n")
-    f.write("|---------|-----------|--------|\n")
-    for ds in homo_datasets:
-        pm, ps = paper_ghc_homo[ds]
-        m, s = load_result(f'GHC_{ds}_trans.json')
-        f.write(f"| {ds} | {pm:.2f}±{ps:.2f} | {fmt(m, s)} |\n")
-    
-    f.write("\n## Table 2: Heterophilic Datasets (Transductive, Accuracy %)\n\n")
-    f.write("| Dataset | Paper GHC | My GHC |\n")
-    f.write("|---------|-----------|--------|\n")
-    for ds in hetero_datasets:
-        pm, ps = paper_ghc_hetero[ds]
-        m, s = load_result(f'GHC_{ds}_trans.json')
-        f.write(f"| {ds} | {pm:.2f}±{ps:.2f} | {fmt(m, s)} |\n")
-    
-    f.write("\n## Table 3: Graph-Level (ZINC MAE, lower is better)\n\n")
-    m, s = load_result('GHC_ZINC_graph.json')
-    if m is not None:
-        f.write(f"| ZINC | 0.337±0.020 | {fmt(m, s, multiply=None, decimals=3)} |\n")
-    else:
-        f.write("| ZINC | 0.337±0.020 | Not yet available |\n")
-    
-    f.write("\n## Baselines\n\n")
-    f.write("| Model/Dataset | Paper | Mine |\n")
-    f.write("|--------------|-------|------|\n")
-    for fname, label, (pm, ps) in baselines:
-        m, s = load_result(fname)
-        f.write(f"| {label} | {pm:.2f}±{ps:.2f} | {fmt(m, s)} |\n")
-
-print("\nSaved results/results_tables.md")
+print("\nSaved markdown tables to results/results_tables.md")
