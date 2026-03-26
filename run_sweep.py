@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quick hyperparameter sweep on Chameleon - minimal."""
+"""Quick hyperparameter sweep on Chameleon - dropout and weight decay."""
 
 import torch
 from train import run_experiment
@@ -10,20 +10,22 @@ base = {
     'dataset': 'Chameleon', 'model': 'GHC', 'task': 'vertex', 'setting': 'transductive',
     'input_dropout': 0.0, 'mix_dropout': 0.0, 'root_conn': True,
     'add_self_loop': True, 'make_undirected': True, 'input_activation': False,
-    'lr': 0.001, 'weight_decay': 0, 'epochs': 300, 'patience': 50,
-    'num_seeds': 1, 'num_splits': 3,
+    'lr': 0.001, 'weight_decay': 0, 'epochs': 200, 'patience': 30,
+    'num_seeds': 1, 'num_splits': 1,
     'hidden_dim': 256, 'mix_dim': 64, 'num_blocks': 2,
     'dropout': 0.5, 'trans_input': False, 'trans_output': True,
     'residual': False, 'normalize_input': False, 'mean_agg': True,
 }
 
 variations = [
-    ('baseline', {}),
-    ('residual', {'residual': True}),
-    ('res+norm', {'residual': True, 'normalize_input': True}),
-    ('res+4blk', {'residual': True, 'num_blocks': 4}),
-    ('res+d0.3', {'residual': True, 'dropout': 0.3}),
-    ('not_undir', {'make_undirected': False}),
+    ('d0.3', {'dropout': 0.3}),
+    ('d0.7', {'dropout': 0.7}),
+    ('d0.5_wd1e-4', {'weight_decay': 1e-4}),
+    ('d0.5_wd1e-3', {'weight_decay': 1e-3}),
+    ('d0.5_id0.3', {'input_dropout': 0.3}),
+    ('d0.5_md0.3', {'mix_dropout': 0.3}),
+    ('h128_m32', {'hidden_dim': 128, 'mix_dim': 32}),
+    ('h128_m64', {'hidden_dim': 128, 'mix_dim': 64}),
 ]
 
 for name, delta in variations:
