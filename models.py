@@ -18,19 +18,10 @@ from torch_scatter import scatter_mean, scatter_add
 
 class HyperAggregation(nn.Module):
     """
-    HyperAggregation module.
+    HyperAggregation module (non-batched, for GHM).
     
     Hypernetwork: W_tar = GeLU(X @ W_A) @ W_B
     Target network: HA(X) = (GeLU(X^T @ W_tar) @ W_tar^T)^T
-    
-    Args:
-        hidden_dim: embedding dimension h
-        mix_dim: mixing dimension m
-        mix_dropout: dropout on mixing (applied to embeddings input to target network)
-        trans_input: apply LayerNorm + dropout before target network
-        trans_output: apply LayerNorm + dropout after target network
-        input_activation: apply GeLU to input before hypernetwork
-        dropout: dropout rate for trans_input/trans_output
     """
     def __init__(self, hidden_dim, mix_dim, mix_dropout=0.0,
                  trans_input=False, trans_output=False,
@@ -97,6 +88,8 @@ class HyperAggregationBatched(nn.Module):
     """
     Batched HyperAggregation for GHC - operates on neighborhoods defined by edge_index.
     Uses scatter operations for efficient batched computation.
+    
+    Returns both per-edge outputs (for mean_agg) and per-node outputs (for root readout).
     """
     def __init__(self, hidden_dim, mix_dim, mix_dropout=0.0,
                  trans_input=False, trans_output=False,
@@ -121,33 +114,30 @@ class HyperAggregationBatched(nn.Module):
             self.ln_output = nn.LayerNorm(hidden_dim)
             self.drop_output = nn.Dropout(dropout)
     
-    def forward(self, X, edge_index, num_nodes):
+    def compute_W_tar(self, X):
+        """Compute target weights from features."""
+        if self.input_activation:
+            X_hyper = F.gelu(X)
+        else:
+            X_hyper = X
+        return self.W_B(F.gelu(self.W_A(X_hyper)))  # (N, m)
+    
+    def forward(self, X, edge_index, num_nodes, mean_agg=True):
         """
         X: (num_nodes, h) - all node features
         edge_index: (2, E) - edges (src -> dst means src is neighbor of dst)
         num_nodes: number of nodes
+        mean_agg: if True, return mean of per-edge outputs; if False, return root readout
         
-        For each target node v, we need to:
-        1. Gather neighborhood features X_N(v)
-        2. Compute W_tar for each neighborhood
-        3. Apply target network per neighborhood
-        
-        This is done efficiently using scatter operations.
+        Returns: (num_nodes, h) - per-node output
         """
         src, dst = edge_index[0], edge_index[1]
         
         # Get source node features (neighbors)
         X_src = X[src]  # (E, h)
         
-        # Optional input activation
-        if self.input_activation:
-            X_hyper = F.gelu(X_src)
-        else:
-            X_hyper = X_src
-        
         # Hypernetwork: W_tar per edge
-        # W_tar_edge = GeLU(X_src @ W_A) @ W_B -> (E, m)
-        W_tar_edge = self.W_B(F.gelu(self.W_A(X_hyper)))  # (E, m)
+        W_tar_edge = self.compute_W_tar(X_src)  # (E, m)
         
         # For target network input
         if self.trans_input:
@@ -158,38 +148,42 @@ class HyperAggregationBatched(nn.Module):
         if self.training and self.mix_dropout > 0:
             X_target = F.dropout(X_target, p=self.mix_dropout, training=True)
         
-        # Target network per neighborhood:
-        # For each dst node v:
-        #   step1: X_N(v)^T @ W_tar_N(v) -> (h, m)  [sum over neighbors]
-        #   step2: GeLU(step1) @ W_tar_N(v)^T -> (h, |N(v)|)
-        #   But we need per-edge outputs, so we do it differently.
-        
-        # Step 1: For each dst, compute sum_j X_j * W_tar_j^T for each mix dim
-        # This is: for each dst v, sum over src j in N(v): X_target[j] outer W_tar[j]
-        # = scatter_add of X_target[e] * W_tar[e] grouped by dst
-        # Result shape: (num_nodes, h, m)
-        
-        # Efficient: compute X_target (E,h,1) * W_tar (E,1,m) -> (E, h, m)
-        # Then scatter_add by dst -> (num_nodes, h, m)
+        # Step 1: For each dst v, compute sum_j X_j outer W_tar_j grouped by dst
+        # X_target (E,h,1) * W_tar (E,1,m) -> (E, h, m)
+        # scatter_add by dst -> (num_nodes, h, m)
         cross = X_target.unsqueeze(2) * W_tar_edge.unsqueeze(1)  # (E, h, m)
         agg = torch.zeros(num_nodes, self.hidden_dim, self.mix_dim, 
                          device=X.device, dtype=X.dtype)
         agg.scatter_add_(0, dst.unsqueeze(1).unsqueeze(2).expand_as(cross), cross)
         
-        # Apply GeLU
+        # Apply GeLU: GeLU(X^T @ W_tar) 
         agg = F.gelu(agg)  # (num_nodes, h, m)
         
-        # Step 2: For each edge (src->dst), compute agg[dst] @ W_tar[edge]
-        # agg[dst]: (h, m), W_tar[edge]: (m,) -> (h,)
-        # This gives per-edge output
-        agg_dst = agg[dst]  # (E, h, m)
-        out_edge = (agg_dst * W_tar_edge.unsqueeze(1)).sum(dim=2)  # (E, h)
+        if mean_agg:
+            # Step 2: For each edge, compute agg[dst] @ W_tar[edge] -> per-edge output
+            agg_dst = agg[dst]  # (E, h, m)
+            out_edge = (agg_dst * W_tar_edge.unsqueeze(1)).sum(dim=2)  # (E, h)
+            
+            # Optional: transform after target network
+            if self.trans_output:
+                out_edge = self.drop_output(self.ln_output(out_edge))
+            
+            # Mean pool per-edge outputs
+            out = scatter_mean(out_edge, dst, dim=0, dim_size=num_nodes)  # (num_nodes, h)
+        else:
+            # Root vertex readout: use the ROOT vertex's own W_tar to read from agg
+            # For each node v, compute agg[v] @ W_tar_v where W_tar_v is computed from X[v]
+            W_tar_root = self.compute_W_tar(X)  # (num_nodes, m) - using each node's own features
+            
+            # out[v] = agg[v] @ W_tar_root[v] -> (h,)
+            # agg: (num_nodes, h, m), W_tar_root: (num_nodes, m)
+            out = (agg * W_tar_root.unsqueeze(1)).sum(dim=2)  # (num_nodes, h)
+            
+            # Optional: transform after target network
+            if self.trans_output:
+                out = self.drop_output(self.ln_output(out))
         
-        # Optional: transform after target network
-        if self.trans_output:
-            out_edge = self.drop_output(self.ln_output(out_edge))
-        
-        return out_edge, src, dst
+        return out
 
 
 class GHCBlock(nn.Module):
@@ -245,37 +239,8 @@ class GHCBlock(nn.Module):
         # First FF
         H = self.drop(F.gelu(self.ff1(X)))  # (num_nodes, hidden_dim)
         
-        # HyperAggregation
-        out_edge, src, dst = self.ha(H, edge_index, num_nodes)  # (E, hidden_dim)
-        
-        # Aggregate: mean or root
-        if self.mean_agg:
-            # Mean pool over neighborhood for each dst node
-            agg = scatter_mean(out_edge, dst, dim=0, dim_size=num_nodes)  # (num_nodes, hidden_dim)
-        else:
-            # Use root vertex embedding (self-loop edge)
-            # The root vertex is the one where src == dst
-            # But with self-loops, we can just use the output for self-loop edges
-            # Simpler: just use mean (which includes self-loop)
-            # Actually, "root vertex embedding" means we pick the embedding of v itself after HA
-            # With self-loops, the self-loop edge gives us the root's contribution
-            # Let's use scatter to get the self-loop contribution
-            # But it's mixed with neighbor contributions in the target network
-            # The paper says "either the embedding of the root vertex or the mean"
-            # I think "root vertex embedding" means: from the HA output, take only the 
-            # row corresponding to the root vertex (which is the self-loop edge output)
-            
-            # Find self-loop edges
-            self_loop_mask = (src == dst)
-            if self_loop_mask.any():
-                # For nodes with self-loops, use the self-loop edge output
-                self_loop_dst = dst[self_loop_mask]
-                self_loop_out = out_edge[self_loop_mask]
-                agg = torch.zeros(num_nodes, out_edge.size(1), device=X.device, dtype=X.dtype)
-                agg[self_loop_dst] = self_loop_out
-            else:
-                # Fallback to mean if no self-loops
-                agg = scatter_mean(out_edge, dst, dim=0, dim_size=num_nodes)
+        # HyperAggregation - returns per-node output directly
+        agg = self.ha(H, edge_index, num_nodes, mean_agg=self.mean_agg)  # (num_nodes, hidden_dim)
         
         # Root connection: concat root embedding (from H) with aggregated
         if self.root_conn:
@@ -504,19 +469,10 @@ class GHM(nn.Module):
                 return self.head(x)
         else:
             # Vertex-level: process neighborhoods
-            # For efficiency, we process all nodes' neighborhoods
-            # Using the GHC-style batched approach but treating as fully connected
-            # Actually, for GHM we need to sample k-hop neighborhoods
-            # This is expensive per-node. Let's use a simpler approach:
-            # Process the whole graph through blocks (like GHC but fully connected within k-hop)
-            
-            # For simplicity and efficiency, use the same approach as GHC
-            # but with k-hop expanded edge_index (fully connected within k-hop)
             if node_indices is None:
                 node_indices = torch.arange(x.size(0), device=x.device)
             
             # Build k-hop neighborhoods and process
-            # For efficiency, process all at once using batched neighborhoods
             all_outputs = torch.zeros(x.size(0), self.head.in_features, device=x.device)
             
             for idx in node_indices:
@@ -628,18 +584,35 @@ if __name__ == '__main__':
     print(f"  Input: {X.shape}, Output: {out.shape}")
     assert out.shape == X.shape
     
-    # Test HyperAggregationBatched
-    print("Testing HyperAggregationBatched...")
+    # Test HyperAggregationBatched (mean_agg=True)
+    print("Testing HyperAggregationBatched (mean_agg)...")
     hab = HyperAggregationBatched(64, 32).to(device)
     edge_index = torch.tensor([[0,1,2,1,0,1,2,3,4], 
                                 [1,0,1,2,0,1,2,3,4]], dtype=torch.long).to(device)
     X = torch.randn(5, 64).to(device)
-    out_edge, src, dst = hab(X, edge_index, 5)
-    print(f"  Input: {X.shape}, Edges: {edge_index.shape}, Output: {out_edge.shape}")
+    out = hab(X, edge_index, 5, mean_agg=True)
+    print(f"  Input: {X.shape}, Edges: {edge_index.shape}, Output: {out.shape}")
+    assert out.shape == (5, 64)
     
-    # Test GHC
-    print("Testing GHC...")
-    model = GHC(100, 64, 7, num_blocks=2, mix_dim=32).to(device)
+    # Test HyperAggregationBatched (root readout, mean_agg=False)
+    print("Testing HyperAggregationBatched (root readout)...")
+    out = hab(X, edge_index, 5, mean_agg=False)
+    print(f"  Input: {X.shape}, Edges: {edge_index.shape}, Output: {out.shape}")
+    assert out.shape == (5, 64)
+    
+    # Test GHC (mean_agg=True, with self-loops)
+    print("Testing GHC (mean_agg=True)...")
+    model = GHC(100, 64, 7, num_blocks=2, mix_dim=32, mean_agg=True, add_self_loop=True).to(device)
+    X = torch.randn(50, 100).to(device)
+    edge_index = torch.randint(0, 50, (2, 200)).to(device)
+    out = model(X, edge_index)
+    print(f"  Input: {X.shape}, Output: {out.shape}")
+    assert out.shape == (50, 7)
+    
+    # Test GHC (mean_agg=False, without self-loops - like Roman-Empire)
+    print("Testing GHC (mean_agg=False, no self-loops)...")
+    model = GHC(100, 64, 7, num_blocks=2, mix_dim=32, mean_agg=False, add_self_loop=False, 
+                root_conn=True, residual=True, make_undirected=True).to(device)
     X = torch.randn(50, 100).to(device)
     edge_index = torch.randint(0, 50, (2, 200)).to(device)
     out = model(X, edge_index)
