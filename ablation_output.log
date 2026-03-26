@@ -1,0 +1,63 @@
+/usr/local/lib/python3.10/dist-packages/torch/cuda/__init__.py:58: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+============================================================
+Running base configs...
+
+Cora base:
+  Split 0/3, Seed 0/3... Test: 0.8058 (13.9s, 100 epochs)
+  Split 0/3, Seed 1/3... Test: 0.8185 (7.8s, 113 epochs)
+  Split 0/3, Seed 2/3... Test: 0.8142 (6.3s, 91 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7485 (5.3s, 77 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7634 (5.7s, 83 epochs)
+  Split 1/3, Seed 2/3... Test: 0.8045 (6.1s, 88 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7769 (6.3s, 91 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7668 (6.6s, 95 epochs)
+  Split 2/3, Seed 2/3... Test: 0.7892 (6.5s, 92 epochs)
+>>> Cora base: 78.75
+
+Roman-Empire base:
+  Split 0/1, Seed 0/3... Test: 0.8577 (48.3s, 184 epochs)
+  Split 0/1, Seed 1/3... Test: 0.8537 (49.4s, 200 epochs)
+  Split 0/1, Seed 2/3... Test: 0.8577 (49.5s, 200 epochs)
+>>> RE base: 85.64
+
+>>> Ablation: Self-loops
+  Split 0/3, Seed 0/3... Test: 0.8049 (6.4s, 113 epochs)
+  Split 0/3, Seed 1/3... Test: 0.7913 (6.4s, 111 epochs)
+  Split 0/3, Seed 2/3... Test: 0.8015 (7.1s, 124 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7871 (7.9s, 137 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7277 (5.0s, 86 epochs)
+  Split 1/3, Seed 2/3... Test: 0.7668 (6.2s, 107 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7655 (6.5s, 112 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7718 (7.6s, 133 epochs)
+  Split 2/3, Seed 2/3... Test: 0.7574 (6.4s, 111 epochs)
+  Split 0/1, Seed 0/3... Test: 0.8173 (64.5s, 200 epochs)
+  Split 0/1, Seed 1/3... Test: 0.8304 (60.3s, 200 epochs)
+  Split 0/1, Seed 2/3... Test: 0.8138 (43.3s, 143 epochs)
+>>> Self-loops: Cora Δ=-1.26 (paper -2.84), RE Δ=-3.59 (paper -0.13)
+
+>>> Ablation: Normalize input
+  Split 0/3, Seed 0/3... Test: 0.7863 (7.5s, 108 epochs)
+  Split 0/3, Seed 1/3... Test: 0.7761 (6.8s, 98 epochs)
+  Split 0/3, Seed 2/3... Test: 0.7824 (6.0s, 87 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7413 (5.8s, 83 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7489 (5.7s, 82 epochs)
+  Split 1/3, Seed 2/3... Test: 0.7964 (6.5s, 93 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7600 (6.1s, 88 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7659 (7.2s, 102 epochs)
+  Split 2/3, Seed 2/3... Test: 0.7727 (9.5s, 137 epochs)
+  Split 0/1, Seed 0/3... Test: 0.8285 (49.2s, 200 epochs)
+  Split 0/1, Seed 1/3... Test: 0.8240 (49.2s, 200 epochs)
+  Split 0/1, Seed 2/3... Test: 0.8341 (49.3s, 200 epochs)
+>>> Normalize input: Cora Δ=-1.75 (paper -0.66), RE Δ=-2.75 (paper -0.01)
+
+>>> Ablation: Residual
+  Split 0/3, Seed 0/3... Test: 0.7833 (5.3s, 75 epochs)
+  Split 0/3, Seed 1/3... Test: 0.7841 (5.7s, 85 epochs)
+  Split 0/3, Seed 2/3... Test: 0.7939 (5.4s, 78 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7964 (5.6s, 79 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7897 (5.9s, 83 epochs)
+  Split 1/3, Seed 2/3... Test: 0.8053 (6.1s, 87 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7714 (5.8s, 83 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7998 (5.8s, 82 epochs)
+  Split 2/3, Seed 2/3... 

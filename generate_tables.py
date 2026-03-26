@@ -1,135 +1,159 @@
 #!/usr/bin/env python3
-"""Generate result tables comparing our results with paper."""
+"""Generate result tables from saved JSON results."""
+
 import json
 import os
-import numpy as np
 
 results_dir = 'results'
 
 def load_result(filename):
     path = os.path.join(results_dir, filename)
-    if not os.path.exists(path):
-        return None
-    with open(path) as f:
-        return json.load(f)
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    return None
+
+def fmt(result, metric='accuracy'):
+    """Format result as mean ± std."""
+    if result is None:
+        return "N/A"
+    if metric == 'accuracy':
+        return f"{result['test_mean']*100:.2f} ± {result['test_std']*100:.2f}"
+    elif metric == 'mae':
+        return f"{result['test_mean']:.4f} ± {result['test_std']:.4f}"
 
 # Table 1: Homophilic datasets (transductive)
 print("=" * 80)
-print("TABLE 1: Homophilic Datasets (Transductive Vertex Classification)")
+print("Table 1: Homophilic Datasets (Transductive)")
 print("=" * 80)
+
+paper_ghc = {
+    'Cora': '78.85 ± 2.14',
+    'CiteSeer': '66.82 ± 1.66',
+    'PubMed': '76.31 ± 2.71',
+    'Computers': '82.12 ± 1.91',
+    'Photo': '91.63 ± 0.79',
+}
+
+paper_gcn = {
+    'Cora': '78.43 ± 2.09',
+    'CiteSeer': '66.75 ± 1.55',
+    'PubMed': '75.62 ± 2.56',
+    'Computers': '82.44 ± 1.76',
+    'Photo': '91.40 ± 1.30',
+}
+
+datasets_homo = ['Cora', 'CiteSeer', 'PubMed', 'Computers', 'Photo']
 print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20} {'Paper GCN':<20} {'Our GCN':<20}")
-print("-" * 95)
-
-homo_datasets = [
-    ('Cora', 'GHC_Cora_trans.json', '78.85±2.14', 'GCN_Cora_trans.json', '78.43±1.32'),
-    ('CiteSeer', 'GHC_CiteSeer_trans.json', '66.82±1.66', 'GCN_CiteSeer_trans.json', '66.75±1.86'),
-    ('PubMed', 'GHC_PubMed_trans.json', '76.31±2.71', 'GCN_PubMed_trans.json', '75.62±1.97'),
-    ('Computers', 'GHC_Computers_trans.json', '82.12±1.91', None, '81.37±1.70'),
-    ('Photo', 'GHC_Photo_trans.json', '91.63±0.79', None, '90.36±0.83'),
-]
-
-for name, ghc_file, paper_ghc, gcn_file, paper_gcn in homo_datasets:
-    ghc_result = load_result(ghc_file)
-    gcn_result = load_result(gcn_file) if gcn_file else None
-    
-    ghc_str = f"{ghc_result['test_mean']*100:.2f}±{ghc_result['test_std']*100:.2f}" if ghc_result else "N/A"
-    gcn_str = f"{gcn_result['test_mean']*100:.2f}±{gcn_result['test_std']*100:.2f}" if gcn_result else "N/A"
-    
-    print(f"{name:<15} {paper_ghc:<20} {ghc_str:<20} {paper_gcn:<20} {gcn_str:<20}")
-
-print()
+print("-" * 80)
+for ds in datasets_homo:
+    ghc = load_result(f'GHC_{ds}_trans.json')
+    gcn = load_result(f'GCN_{ds}_trans.json')
+    print(f"{ds:<15} {paper_ghc.get(ds, 'N/A'):<20} {fmt(ghc):<20} {paper_gcn.get(ds, 'N/A'):<20} {fmt(gcn) if gcn else 'N/A':<20}")
 
 # Table 2: Heterophilic datasets (transductive)
+print("\n" + "=" * 80)
+print("Table 2: Heterophilic Datasets (Transductive)")
 print("=" * 80)
-print("TABLE 2: Heterophilic Datasets (Transductive Vertex Classification)")
-print("=" * 80)
+
+paper_ghc_het = {
+    'Chameleon': '74.78 ± 1.82',
+    'Squirrel': '62.90 ± 1.47',
+    'Actor': '36.40 ± 1.46',
+    'Minesweeper': '87.49 ± 0.61',
+    'RomanEmpire': '92.27 ± 0.57',
+}
+
+datasets_het = ['Chameleon', 'Squirrel', 'Actor', 'Minesweeper', 'RomanEmpire']
 print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20}")
 print("-" * 55)
+for ds in datasets_het:
+    ghc = load_result(f'GHC_{ds}_trans.json')
+    print(f"{ds:<15} {paper_ghc_het.get(ds, 'N/A'):<20} {fmt(ghc):<20}")
 
-hetero_datasets = [
-    ('Chameleon', 'GHC_Chameleon_trans.json', '74.78±1.82'),
-    ('Squirrel', 'GHC_Squirrel_trans.json', '62.90±1.47'),
-    ('Actor', 'GHC_Actor_trans.json', '36.40±1.46'),
-    ('Minesweeper', 'GHC_Minesweeper_trans.json', '87.49±0.61'),
-    ('Roman-Empire', 'GHC_RomanEmpire_trans.json', '92.27±0.57'),
-]
-
-for name, ghc_file, paper_ghc in hetero_datasets:
-    ghc_result = load_result(ghc_file)
-    ghc_str = f"{ghc_result['test_mean']*100:.2f}±{ghc_result['test_std']*100:.2f}" if ghc_result else "N/A"
-    print(f"{name:<15} {paper_ghc:<20} {ghc_str:<20}")
-
-print()
-
-# Table 3: Graph-level tasks
+# Table 3: Graph-level (ZINC)
+print("\n" + "=" * 80)
+print("Table 3: Graph-Level Tasks (ZINC MAE ↓)")
 print("=" * 80)
-print("TABLE 3: Graph-Level Tasks (ZINC - MAE, lower is better)")
-print("=" * 80)
-print(f"{'Dataset':<15} {'Paper GHC':<20} {'Our GHC':<20}")
+zinc = load_result('GHC_ZINC_graph.json')
+print(f"{'Model':<15} {'Paper':<20} {'Ours':<20}")
 print("-" * 55)
+print(f"{'GHC':<15} {'0.337 ± 0.020':<20} {fmt(zinc, 'mae') if zinc else 'N/A':<20}")
 
-zinc_result = load_result('GHC_ZINC_graph.json')
-if zinc_result:
-    zinc_str = f"{zinc_result['test_mean']:.3f}±{zinc_result['test_std']:.3f}"
-    print(f"{'ZINC':<15} {'0.337±0.020':<20} {zinc_str:<20}")
-
-print()
-
-# Baselines
+# Table 5: Ablation
+print("\n" + "=" * 80)
+print("Table 5: Ablation Study (GHC)")
 print("=" * 80)
-print("BASELINE COMPARISONS")
-print("=" * 80)
-print(f"{'Dataset':<15} {'Model':<10} {'Paper':<20} {'Ours':<20}")
-print("-" * 65)
-
-baselines = [
-    ('Cora', 'GCN', 'GCN_Cora_trans.json', '78.43±1.32'),
-    ('Cora', 'MLP', 'MLP_Cora_trans.json', '56.29±1.54'),
-    ('CiteSeer', 'GCN', 'GCN_CiteSeer_trans.json', '66.75±1.86'),
-    ('PubMed', 'GCN', 'GCN_PubMed_trans.json', '75.62±1.97'),
-    ('Chameleon', 'GCN', 'GCN_Chameleon_trans.json', '69.63±2.03'),
-    ('Chameleon', 'MLP', 'MLP_Chameleon_trans.json', '45.57±4.04'),
-]
-
-for name, model, file, paper in baselines:
-    result = load_result(file)
-    our_str = f"{result['test_mean']*100:.2f}±{result['test_std']*100:.2f}" if result else "N/A"
-    print(f"{name:<15} {model:<10} {paper:<20} {our_str:<20}")
+abl_path = os.path.join(results_dir, 'ablation_table5.json')
+if os.path.exists(abl_path):
+    with open(abl_path) as f:
+        abl = json.load(f)
+    
+    cora_base = abl.get('cora_base', 0)
+    re_base = abl.get('re_base', 0)
+    
+    print(f"{'Hyperparameter':<25} {'Cora Δ':>10} {'Paper Δ':>10} {'RE Δ':>10} {'Paper Δ':>10}")
+    print("-" * 70)
+    print(f"{'Base':<25} {cora_base:>10.2f} {'78.85':>10} {re_base:>10.2f} {'92.27':>10}")
+    
+    paper_deltas = {
+        'Self-loops': (-2.84, -0.13),
+        'Normalize input': (-0.66, -0.01),
+        'Residual': (-3.09, -1.22),
+        'Root connection': (-0.50, -1.72),
+        'Mean aggregate': (-1.35, -2.64),
+        'Trans HA input': (0.47, -1.15),
+        'Trans HA output': (-4.83, -0.08),
+    }
+    
+    for name, (pcd, prd) in paper_deltas.items():
+        cora_data = abl.get(f'cora_{name}', {})
+        re_data = abl.get(f're_{name}', {})
+        cd = cora_data.get('delta', 'N/A') if isinstance(cora_data, dict) else 'N/A'
+        rd = re_data.get('delta', 'N/A') if isinstance(re_data, dict) else 'N/A'
+        cd_str = f"{cd:+.2f}" if isinstance(cd, (int, float)) else cd
+        rd_str = f"{rd:+.2f}" if isinstance(rd, (int, float)) else rd
+        print(f"{name:<25} {cd_str:>10} {pcd:>+10.2f} {rd_str:>10} {prd:>+10.2f}")
+else:
+    print("Ablation results not yet available.")
 
 # Save as markdown
 with open('results/results_tables.md', 'w') as f:
     f.write("# Replication Results\n\n")
+    
     f.write("## Table 1: Homophilic Datasets (Transductive)\n\n")
     f.write("| Dataset | Paper GHC | Our GHC | Paper GCN | Our GCN |\n")
     f.write("|---------|-----------|---------|-----------|--------|\n")
-    for name, ghc_file, paper_ghc, gcn_file, paper_gcn in homo_datasets:
-        ghc_result = load_result(ghc_file)
-        gcn_result = load_result(gcn_file) if gcn_file else None
-        ghc_str = f"{ghc_result['test_mean']*100:.2f}±{ghc_result['test_std']*100:.2f}" if ghc_result else "N/A"
-        gcn_str = f"{gcn_result['test_mean']*100:.2f}±{gcn_result['test_std']*100:.2f}" if gcn_result else "N/A"
-        f.write(f"| {name} | {paper_ghc} | {ghc_str} | {paper_gcn} | {gcn_str} |\n")
+    for ds in datasets_homo:
+        ghc = load_result(f'GHC_{ds}_trans.json')
+        gcn = load_result(f'GCN_{ds}_trans.json')
+        f.write(f"| {ds} | {paper_ghc.get(ds, 'N/A')} | {fmt(ghc)} | {paper_gcn.get(ds, 'N/A')} | {fmt(gcn) if gcn else 'N/A'} |\n")
     
     f.write("\n## Table 2: Heterophilic Datasets (Transductive)\n\n")
     f.write("| Dataset | Paper GHC | Our GHC |\n")
     f.write("|---------|-----------|--------|\n")
-    for name, ghc_file, paper_ghc in hetero_datasets:
-        ghc_result = load_result(ghc_file)
-        ghc_str = f"{ghc_result['test_mean']*100:.2f}±{ghc_result['test_std']*100:.2f}" if ghc_result else "N/A"
-        f.write(f"| {name} | {paper_ghc} | {ghc_str} |\n")
+    for ds in datasets_het:
+        ghc = load_result(f'GHC_{ds}_trans.json')
+        f.write(f"| {ds} | {paper_ghc_het.get(ds, 'N/A')} | {fmt(ghc)} |\n")
     
-    f.write("\n## Table 3: Graph-Level (ZINC MAE, lower is better)\n\n")
-    f.write("| Dataset | Paper GHC | Our GHC |\n")
-    f.write("|---------|-----------|--------|\n")
-    if zinc_result:
-        zinc_str = f"{zinc_result['test_mean']:.3f}±{zinc_result['test_std']:.3f}"
-        f.write(f"| ZINC | 0.337±0.020 | {zinc_str} |\n")
+    f.write("\n## Table 3: Graph-Level (ZINC MAE ↓)\n\n")
+    f.write("| Model | Paper | Ours |\n")
+    f.write("|-------|-------|------|\n")
+    zinc = load_result('GHC_ZINC_graph.json')
+    f.write(f"| GHC | 0.337 ± 0.020 | {fmt(zinc, 'mae') if zinc else 'N/A'} |\n")
     
-    f.write("\n## Baselines\n\n")
-    f.write("| Dataset | Model | Paper | Ours |\n")
-    f.write("|---------|-------|-------|------|\n")
-    for name, model, file, paper in baselines:
-        result = load_result(file)
-        our_str = f"{result['test_mean']*100:.2f}±{result['test_std']*100:.2f}" if result else "N/A"
-        f.write(f"| {name} | {model} | {paper} | {our_str} |\n")
+    f.write("\n## Table 5: Ablation Study\n\n")
+    if os.path.exists(abl_path):
+        f.write("| Hyperparameter | Cora Δ | Paper Δ | RE Δ | Paper Δ |\n")
+        f.write("|----------------|--------|---------|------|--------|\n")
+        f.write(f"| Base | {cora_base:.2f} | 78.85 | {re_base:.2f} | 92.27 |\n")
+        for name, (pcd, prd) in paper_deltas.items():
+            cora_data = abl.get(f'cora_{name}', {})
+            re_data = abl.get(f're_{name}', {})
+            cd = cora_data.get('delta', 'N/A') if isinstance(cora_data, dict) else 'N/A'
+            rd = re_data.get('delta', 'N/A') if isinstance(re_data, dict) else 'N/A'
+            cd_str = f"{cd:+.2f}" if isinstance(cd, (int, float)) else cd
+            rd_str = f"{rd:+.2f}" if isinstance(rd, (int, float)) else rd
+            f.write(f"| {name} | {cd_str} | {pcd:+.2f} | {rd_str} | {prd:+.2f} |\n")
 
-print("\nResults saved to results/results_tables.md")
+print("\n\nResults saved to results/results_tables.md")
