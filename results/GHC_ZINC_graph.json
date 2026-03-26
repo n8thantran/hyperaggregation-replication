@@ -1,10 +1,29 @@
 {
-  "test_mean": 0.44295,
-  "test_std": 0.025050000000000017,
-  "seeds_done": 2,
+  "test_mean": 0.44848903401692713,
+  "test_std": 0.0218915465549042,
   "all_test": [
-    0.468,
-    0.4179
+    0.4679772186279297,
+    0.41791184997558595,
+    0.4595780334472656
   ],
-  "note": "Seed 2 still running"
+  "config": {
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 4,
+    "dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": true,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "epochs": 400,
+    "patience": 80,
+    "batch_size": 128
+  },
+  "paper_target": "0.337 \u00b1 0.020"
 }

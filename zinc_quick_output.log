@@ -50,3 +50,18 @@ Parameters: 1,125,633
   Epoch 100: train=0.5170, val=0.5299, best_val=0.5293, lr=0.000500, time=300s
   Epoch 125: train=0.4953, val=0.5076, best_val=0.5076, lr=0.000500, time=375s
   Epoch 150: train=0.4676, val=0.5075, best_val=0.4926, lr=0.000500, time=450s
+  Epoch 175: train=0.4675, val=0.4916, best_val=0.4781, lr=0.000500, time=525s
+  Epoch 200: train=0.4271, val=0.4698, best_val=0.4695, lr=0.000500, time=600s
+  Epoch 225: train=0.4050, val=0.4728, best_val=0.4606, lr=0.000500, time=675s
+  Epoch 250: train=0.3593, val=0.4575, best_val=0.4535, lr=0.000250, time=750s
+  Epoch 275: train=0.3381, val=0.4523, best_val=0.4508, lr=0.000250, time=825s
+  Epoch 300: train=0.3205, val=0.4569, best_val=0.4500, lr=0.000250, time=900s
+  Epoch 325: train=0.2824, val=0.4502, best_val=0.4429, lr=0.000125, time=975s
+  Epoch 350: train=0.2603, val=0.4501, best_val=0.4429, lr=0.000063, time=1050s
+  Epoch 375: train=0.2468, val=0.4511, best_val=0.4429, lr=0.000031, time=1125s
+  Early stopping at epoch 386
+  Seed 2: test_mae=0.4596, best_val=0.4429, epochs=386, time=1158.7s
+
+Final ZINC GHC: MAE = 0.4485 ± 0.0219
+Paper target: 0.337 ± 0.020
+Saved to results/GHC_ZINC_graph.json
