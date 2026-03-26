@@ -10,7 +10,7 @@
 #
 # Usage:
 #   bash reproduce.sh          # Full reproduction (several hours)
-#   bash reproduce.sh --quick  # Quick mode with fewer seeds (~1 hour)
+#   bash reproduce.sh --quick  # Quick mode with fewer seeds (~30 min)
 #
 # Results are saved to /workspace/results/
 
@@ -49,7 +49,11 @@ python run_reproduce.py $QUICK_FLAG --skip-existing --baselines
 echo ""
 echo "Step 2: Running ablation study (Table 5)..."
 echo "============================================================"
-python run_ablation_fast.py
+if [ -f results/ablation_table5.json ]; then
+    echo "  Ablation results already exist, skipping..."
+else
+    python run_ablation_fast.py
+fi
 
 # ============================================================
 # Step 3: Generate result tables
@@ -65,3 +69,4 @@ echo "All experiments complete!"
 echo "Results saved to /workspace/results/"
 echo "Summary table: /workspace/results/results_tables.md"
 echo "============================================================"
+cat results/results_tables.md

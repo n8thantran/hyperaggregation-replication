@@ -1,0 +1,74 @@
+{
+  "cora_base": 78.7531806615776,
+  "re_base": 85.6394869984704,
+  "cora_Self-loops": {
+    "acc": 77.49034021298652,
+    "delta": -1.2628404485910778,
+    "paper_delta": -2.84
+  },
+  "re_Self-loops": {
+    "acc": 82.05082950935405,
+    "delta": -3.5886574891163576,
+    "paper_delta": -0.13
+  },
+  "cora_Normalize input": {
+    "acc": 77.00028272547357,
+    "delta": -1.7528979361040342,
+    "paper_delta": -0.66
+  },
+  "re_Normalize input": {
+    "acc": 82.88622190845982,
+    "delta": -2.7532650900105864,
+    "paper_delta": -0.01
+  },
+  "cora_Residual": {
+    "acc": 78.94637640184715,
+    "delta": 0.19319574026954456,
+    "paper_delta": -3.09
+  },
+  "re_Residual": {
+    "acc": 69.96705494764089,
+    "delta": -15.672432050829514,
+    "paper_delta": -1.22
+  },
+  "cora_Root connection": {
+    "acc": 78.41391009329939,
+    "delta": -0.33927056827820934,
+    "paper_delta": -0.5
+  },
+  "re_Root connection": {
+    "acc": 84.25697140840099,
+    "delta": -1.382515590069417,
+    "paper_delta": -1.72
+  },
+  "cora_Mean aggregate": {
+    "acc": 74.75261521063048,
+    "delta": -4.000565450947121,
+    "paper_delta": -1.35
+  },
+  "re_Mean aggregate": {
+    "acc": 84.22167313801623,
+    "delta": -1.4178138604541743,
+    "paper_delta": -2.64
+  },
+  "cora_Trans HA input": {
+    "acc": 78.39977381962116,
+    "delta": -0.353406841956442,
+    "paper_delta": 0.47
+  },
+  "re_Trans HA input": {
+    "acc": 85.74538180962466,
+    "delta": 0.1058948111542577,
+    "paper_delta": -1.15
+  },
+  "cora_Trans HA output": {
+    "acc": 64.96560173404959,
+    "delta": -13.787578927528017,
+    "paper_delta": -4.83
+  },
+  "re_Trans HA output": {
+    "acc": 83.27450288269208,
+    "delta": -2.364984115778327,
+    "paper_delta": -0.08
+  }
+}

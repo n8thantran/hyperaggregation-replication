@@ -38,3 +38,16 @@ Replication of 'HyperAggregation: Aggregating over Graph Edges with Hypernetwork
 | PubMed | GCN | 75.62±2.45 | 74.94±0.24 |
 | Chameleon | GCN | 69.63±1.73 | 37.06±3.43 |
 | Chameleon | MLP | 45.57±2.07 | 49.05±1.44 |
+
+## Table 5: Ablation Study
+
+| Hyperparameter | Cora Δ (ours) | Cora Δ (paper) | RE Δ (ours) | RE Δ (paper) |
+|----------------|---------------|----------------|-------------|--------------|
+| Base | 78.75 | 78.85 | 85.64 | 92.27 |
+| Self-loops | -1.26 | -2.84 | -3.59 | -0.13 |
+| Normalize input | -1.75 | -0.66 | -2.75 | -0.01 |
+| Residual | +0.19 | -3.09 | -15.67 | -1.22 |
+| Root connection | -0.34 | -0.50 | -1.38 | -1.72 |
+| Mean aggregate | -4.00 | -1.35 | -1.42 | -2.64 |
+| Trans HA input | -0.35 | +0.47 | +0.11 | -1.15 |
+| Trans HA output | -13.79 | -4.83 | -2.36 | -0.08 |
