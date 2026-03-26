@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.4904970760233918,
+  "test_std": 0.014361756362857112,
+  "val_mean": 0.5249199817101052,
+  "val_std": 0.006368718919608689,
+  "all_results": [
+    {
+      "train": 0.9157509157509157,
+      "val": 0.522633744855967,
+      "test": 0.47368421052631576,
+      "epochs_trained": 114
+    },
+    {
+      "train": 0.9047619047619048,
+      "val": 0.5185185185185185,
+      "test": 0.5087719298245614,
+      "epochs_trained": 102
+    },
+    {
+      "train": 0.8598901098901099,
+      "val": 0.53360768175583,
+      "test": 0.48903508771929827,
+      "epochs_trained": 78
+    }
+  ],
+  "config": {
+    "name": "MLP_Chameleon_trans",
+    "setting": "transductive",
+    "task": "vertex",
+    "mix_dim": 64,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1,
+    "dataset": "Chameleon",
+    "model": "MLP",
+    "hidden_dim": 256,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "make_undirected": false,
+    "add_self_loop": false,
+    "normalize_input": false
+  }
+}

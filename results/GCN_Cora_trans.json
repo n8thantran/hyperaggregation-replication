@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.7849872773536896,
+  "test_std": 0.002270621770456451,
+  "val_mean": 0.834920634920635,
+  "val_std": 0.009784784131696795,
+  "all_results": [
+    {
+      "train": 0.9928571428571429,
+      "val": 0.8238095238095238,
+      "test": 0.787531806615776,
+      "epochs_trained": 70
+    },
+    {
+      "train": 0.9857142857142858,
+      "val": 0.8476190476190476,
+      "test": 0.7854113655640373,
+      "epochs_trained": 60
+    },
+    {
+      "train": 0.9857142857142858,
+      "val": 0.8333333333333334,
+      "test": 0.7820186598812553,
+      "epochs_trained": 76
+    }
+  ],
+  "config": {
+    "name": "GCN_Cora_trans",
+    "setting": "transductive",
+    "task": "vertex",
+    "mix_dim": 64,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1,
+    "dataset": "Cora",
+    "model": "GCN",
+    "hidden_dim": 256,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "make_undirected": false,
+    "add_self_loop": true,
+    "normalize_input": false
+  }
+}

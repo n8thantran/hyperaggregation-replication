@@ -1,0 +1,90 @@
+{
+  "test_mean": 0.3700292397660818,
+  "test_std": 0.010347118291941813,
+  "val_mean": 0.37052266081871343,
+  "val_std": 0.010557188649364804,
+  "all_results": [
+    {
+      "train": 0.4199561403508772,
+      "val": 0.37870065789473684,
+      "test": 0.3769736842105263,
+      "epochs_trained": 112
+    },
+    {
+      "train": 0.4292763157894737,
+      "val": 0.3762335526315789,
+      "test": 0.3868421052631579,
+      "epochs_trained": 101
+    },
+    {
+      "train": 0.5079495614035088,
+      "val": 0.34539473684210525,
+      "test": 0.36776315789473685,
+      "epochs_trained": 127
+    },
+    {
+      "train": 0.46518640350877194,
+      "val": 0.3692434210526316,
+      "test": 0.3736842105263158,
+      "epochs_trained": 118
+    },
+    {
+      "train": 0.42489035087719296,
+      "val": 0.36554276315789475,
+      "test": 0.3736842105263158,
+      "epochs_trained": 100
+    },
+    {
+      "train": 0.41694078947368424,
+      "val": 0.3675986842105263,
+      "test": 0.37763157894736843,
+      "epochs_trained": 98
+    },
+    {
+      "train": 0.4407894736842105,
+      "val": 0.3840460526315789,
+      "test": 0.3638157894736842,
+      "epochs_trained": 105
+    },
+    {
+      "train": 0.4284539473684211,
+      "val": 0.37006578947368424,
+      "test": 0.35986842105263156,
+      "epochs_trained": 100
+    },
+    {
+      "train": 0.4407894736842105,
+      "val": 0.37787828947368424,
+      "test": 0.35,
+      "epochs_trained": 105
+    }
+  ],
+  "config": {
+    "dataset": "Actor",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": true,
+    "normalize_input": false,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 3,
+    "name": "GHC_Actor_trans"
+  }
+}

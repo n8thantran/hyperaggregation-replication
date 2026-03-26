@@ -1,0 +1,48 @@
+{
+  "test_mean": 0.8115072361454289,
+  "test_std": 0.004941757853865192,
+  "val_mean": 0.818711385701677,
+  "val_std": 0.0037069726390114854,
+  "all_results": [
+    {
+      "train": 0.9769658459094519,
+      "val": 0.8150044130626655,
+      "test": 0.8065654782915637,
+      "epochs_trained": 199
+    },
+    {
+      "train": 0.9872915011914217,
+      "val": 0.8224183583406884,
+      "test": 0.816448993999294,
+      "epochs_trained": 200
+    }
+  ],
+  "config": {
+    "name": "GHC_RomanEmpire_trans",
+    "dataset": "Roman-Empire",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 4,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": true,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "normalize_input": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0,
+    "epochs": 200,
+    "patience": 30,
+    "num_seeds": 2,
+    "num_splits": 1
+  }
+}

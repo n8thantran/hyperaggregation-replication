@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.8617333333333334,
+  "test_std": 0.008002221913665977,
+  "val_mean": 0.8541333333333333,
+  "val_std": 0.0070528166162337,
+  "all_results": [
+    {
+      "train": 0.89,
+      "val": 0.8632,
+      "test": 0.8716,
+      "epochs_trained": 215
+    },
+    {
+      "train": 0.8704,
+      "val": 0.8532,
+      "test": 0.8616,
+      "epochs_trained": 111
+    },
+    {
+      "train": 0.8624,
+      "val": 0.846,
+      "test": 0.852,
+      "epochs_trained": 104
+    }
+  ],
+  "config": {
+    "dataset": "Minesweeper",
+    "model": "GHC",
+    "setting": "transductive",
+    "task": "vertex",
+    "hidden_dim": 256,
+    "mix_dim": 64,
+    "num_blocks": 4,
+    "dropout": 0.5,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": true,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "make_undirected": false,
+    "normalize_input": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1,
+    "name": "GHC_Minesweeper_trans"
+  }
+}

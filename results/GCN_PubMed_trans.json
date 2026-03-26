@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.7493739459293708,
+  "test_std": 0.0024072532641904935,
+  "val_mean": 0.825925925925926,
+  "val_std": 0.018885257457751038,
+  "all_results": [
+    {
+      "train": 1.0,
+      "val": 0.8333333333333334,
+      "test": 0.7461031328256759,
+      "epochs_trained": 181
+    },
+    {
+      "train": 1.0,
+      "val": 0.8,
+      "test": 0.7501916492052946,
+      "epochs_trained": 160
+    },
+    {
+      "train": 1.0,
+      "val": 0.8444444444444444,
+      "test": 0.7518270557571421,
+      "epochs_trained": 231
+    }
+  ],
+  "config": {
+    "name": "GCN_PubMed_trans",
+    "setting": "transductive",
+    "task": "vertex",
+    "mix_dim": 64,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1,
+    "dataset": "PubMed",
+    "model": "GCN",
+    "hidden_dim": 256,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "make_undirected": false,
+    "add_self_loop": true,
+    "normalize_input": false
+  }
+}

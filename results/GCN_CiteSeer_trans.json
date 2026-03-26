@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.6923246338508974,
+  "test_std": 0.005091786376697217,
+  "val_mean": 0.6314814814814814,
+  "val_std": 0.0026189140043946114,
+  "all_results": [
+    {
+      "train": 0.9833333333333333,
+      "val": 0.6333333333333333,
+      "test": 0.6854971919392138,
+      "epochs_trained": 74
+    },
+    {
+      "train": 0.9833333333333333,
+      "val": 0.6333333333333333,
+      "test": 0.6977205153617443,
+      "epochs_trained": 73
+    },
+    {
+      "train": 0.9833333333333333,
+      "val": 0.6277777777777778,
+      "test": 0.6937561942517344,
+      "epochs_trained": 75
+    }
+  ],
+  "config": {
+    "name": "GCN_CiteSeer_trans",
+    "setting": "transductive",
+    "task": "vertex",
+    "mix_dim": 64,
+    "input_dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": false,
+    "trans_input": false,
+    "trans_output": true,
+    "input_activation": false,
+    "lr": 0.001,
+    "weight_decay": 0.0005,
+    "epochs": 300,
+    "patience": 50,
+    "num_seeds": 3,
+    "num_splits": 1,
+    "dataset": "CiteSeer",
+    "model": "GCN",
+    "hidden_dim": 256,
+    "num_blocks": 2,
+    "dropout": 0.5,
+    "make_undirected": false,
+    "add_self_loop": true,
+    "normalize_input": false
+  }
+}
