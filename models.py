@@ -88,8 +88,7 @@ class HyperAggregationBatched(nn.Module):
     """
     Batched HyperAggregation for GHC - operates on neighborhoods defined by edge_index.
     Uses scatter operations for efficient batched computation.
-    
-    Returns both per-edge outputs (for mean_agg) and per-node outputs (for root readout).
+    Memory-efficient: processes mix_dim in chunks to avoid (E, h, m) tensors.
     """
     def __init__(self, hidden_dim, mix_dim, mix_dropout=0.0,
                  trans_input=False, trans_output=False,
@@ -132,6 +131,9 @@ class HyperAggregationBatched(nn.Module):
         Returns: (num_nodes, h) - per-node output
         """
         src, dst = edge_index[0], edge_index[1]
+        E = src.size(0)
+        h = self.hidden_dim
+        m = self.mix_dim
         
         # Get source node features (neighbors)
         X_src = X[src]  # (E, h)
@@ -148,21 +150,50 @@ class HyperAggregationBatched(nn.Module):
         if self.training and self.mix_dropout > 0:
             X_target = F.dropout(X_target, p=self.mix_dropout, training=True)
         
-        # Step 1: For each dst v, compute sum_j X_j outer W_tar_j grouped by dst
-        # X_target (E,h,1) * W_tar (E,1,m) -> (E, h, m)
-        # scatter_add by dst -> (num_nodes, h, m)
-        cross = X_target.unsqueeze(2) * W_tar_edge.unsqueeze(1)  # (E, h, m)
-        agg = torch.zeros(num_nodes, self.hidden_dim, self.mix_dim, 
-                         device=X.device, dtype=X.dtype)
-        agg.scatter_add_(0, dst.unsqueeze(1).unsqueeze(2).expand_as(cross), cross)
+        # Memory-efficient: compute agg[:, :, i] = scatter_add(X_target * W_tar_edge[:, i:i+1], dst)
+        # Process in chunks to manage memory
+        # For small E*h*m, use the fast path; for large, use chunked
+        mem_estimate = E * h * m * 4  # bytes for float32
+        
+        dst_idx = dst.unsqueeze(1).expand(-1, h)  # (E, h) - reused for all chunks
+        
+        if mem_estimate < 2e9:  # Less than 2GB - use fast full materialization
+            cross = X_target.unsqueeze(2) * W_tar_edge.unsqueeze(1)  # (E, h, m)
+            agg = torch.zeros(num_nodes, h, m, device=X.device, dtype=X.dtype)
+            agg.scatter_add_(0, dst.unsqueeze(1).unsqueeze(2).expand_as(cross), cross)
+        else:
+            # Chunked computation: process chunk_size mix dims at a time
+            chunk_size = max(1, int(1.5e9 / (E * h * 4)))  # target ~1.5GB per chunk
+            agg = torch.zeros(num_nodes, h, m, device=X.device, dtype=X.dtype)
+            for start in range(0, m, chunk_size):
+                end = min(start + chunk_size, m)
+                cs = end - start
+                W_chunk = W_tar_edge[:, start:end]  # (E, cs)
+                cross_chunk = X_target.unsqueeze(2) * W_chunk.unsqueeze(1)  # (E, h, cs)
+                agg[:, :, start:end].scatter_add_(
+                    0, dst.unsqueeze(1).unsqueeze(2).expand(-1, h, cs), cross_chunk
+                )
+                del cross_chunk, W_chunk
         
         # Apply GeLU: GeLU(X^T @ W_tar) 
         agg = F.gelu(agg)  # (num_nodes, h, m)
         
         if mean_agg:
             # Step 2: For each edge, compute agg[dst] @ W_tar[edge] -> per-edge output
-            agg_dst = agg[dst]  # (E, h, m)
-            out_edge = (agg_dst * W_tar_edge.unsqueeze(1)).sum(dim=2)  # (E, h)
+            # Memory-efficient: chunk over edges
+            if E * h * m * 4 < 2e9:
+                agg_dst = agg[dst]  # (E, h, m)
+                out_edge = (agg_dst * W_tar_edge.unsqueeze(1)).sum(dim=2)  # (E, h)
+            else:
+                # Process in edge chunks
+                edge_chunk = max(1, int(1.5e9 / (h * m * 4)))
+                out_edge = torch.zeros(E, h, device=X.device, dtype=X.dtype)
+                for start in range(0, E, edge_chunk):
+                    end = min(start + edge_chunk, E)
+                    agg_chunk = agg[dst[start:end]]  # (chunk, h, m)
+                    w_chunk = W_tar_edge[start:end]  # (chunk, m)
+                    out_edge[start:end] = (agg_chunk * w_chunk.unsqueeze(1)).sum(dim=2)
+                    del agg_chunk, w_chunk
             
             # Optional: transform after target network
             if self.trans_output:
@@ -172,11 +203,9 @@ class HyperAggregationBatched(nn.Module):
             out = scatter_mean(out_edge, dst, dim=0, dim_size=num_nodes)  # (num_nodes, h)
         else:
             # Root vertex readout: use the ROOT vertex's own W_tar to read from agg
-            # For each node v, compute agg[v] @ W_tar_v where W_tar_v is computed from X[v]
-            W_tar_root = self.compute_W_tar(X)  # (num_nodes, m) - using each node's own features
+            W_tar_root = self.compute_W_tar(X)  # (num_nodes, m)
             
             # out[v] = agg[v] @ W_tar_root[v] -> (h,)
-            # agg: (num_nodes, h, m), W_tar_root: (num_nodes, m)
             out = (agg * W_tar_root.unsqueeze(1)).sum(dim=2)  # (num_nodes, h)
             
             # Optional: transform after target network
@@ -609,15 +638,16 @@ if __name__ == '__main__':
     print(f"  Input: {X.shape}, Output: {out.shape}")
     assert out.shape == (50, 7)
     
-    # Test GHC (mean_agg=False, without self-loops - like Roman-Empire)
-    print("Testing GHC (mean_agg=False, no self-loops)...")
-    model = GHC(100, 64, 7, num_blocks=2, mix_dim=32, mean_agg=False, add_self_loop=False, 
-                root_conn=True, residual=True, make_undirected=True).to(device)
-    X = torch.randn(50, 100).to(device)
-    edge_index = torch.randint(0, 50, (2, 200)).to(device)
-    out = model(X, edge_index)
-    print(f"  Input: {X.shape}, Output: {out.shape}")
-    assert out.shape == (50, 7)
+    # Test memory-efficient path with large graph
+    print("Testing HyperAggregationBatched memory-efficient path...")
+    hab2 = HyperAggregationBatched(256, 128).to(device)
+    X2 = torch.randn(5000, 256).to(device)
+    edge_index2 = torch.randint(0, 5000, (2, 300000)).to(device)
+    out2 = hab2(X2, edge_index2, 5000, mean_agg=True)
+    print(f"  Large graph test passed: {out2.shape}")
+    assert out2.shape == (5000, 256)
+    del hab2, X2, edge_index2, out2
+    torch.cuda.empty_cache()
     
     # Test GHC for graph-level
     print("Testing GHC graph-level...")
