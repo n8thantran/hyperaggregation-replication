@@ -60,4 +60,22 @@ Roman-Empire base:
   Split 1/3, Seed 2/3... Test: 0.8053 (6.1s, 87 epochs)
   Split 2/3, Seed 0/3... Test: 0.7714 (5.8s, 83 epochs)
   Split 2/3, Seed 1/3... Test: 0.7998 (5.8s, 82 epochs)
-  Split 2/3, Seed 2/3... 
+  Split 2/3, Seed 2/3... Test: 0.7812 (5.1s, 72 epochs)
+  Split 0/1, Seed 0/3... Test: 0.6770 (49.3s, 200 epochs)
+  Split 0/1, Seed 1/3... Test: 0.6936 (49.2s, 200 epochs)
+  Split 0/1, Seed 2/3... Test: 0.7284 (48.9s, 200 epochs)
+>>> Residual: Cora Δ=+0.19 (paper -3.09), RE Δ=-15.67 (paper -1.22)
+
+>>> Ablation: Root connection
+  Split 0/3, Seed 0/3... Test: 0.8198 (7.5s, 111 epochs)
+  Split 0/3, Seed 1/3... Test: 0.7846 (5.7s, 85 epochs)
+  Split 0/3, Seed 2/3... Test: 0.7854 (5.9s, 87 epochs)
+  Split 1/3, Seed 0/3... Test: 0.7926 (6.6s, 97 epochs)
+  Split 1/3, Seed 1/3... Test: 0.7884 (5.3s, 78 epochs)
+  Split 1/3, Seed 2/3... Test: 0.7591 (5.6s, 83 epochs)
+  Split 2/3, Seed 0/3... Test: 0.7897 (6.0s, 89 epochs)
+  Split 2/3, Seed 1/3... Test: 0.7362 (5.3s, 79 epochs)
+  Split 2/3, Seed 2/3... Test: 0.8015 (6.7s, 99 epochs)
+  Split 0/1, Seed 0/3... Test: 0.8392 (48.6s, 200 epochs)
+  Split 0/1, Seed 1/3... Test: 0.8509 (48.6s, 200 epochs)
+  Split 0/1, Seed 2/3... 
