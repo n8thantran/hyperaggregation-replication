@@ -133,6 +133,8 @@ def create_model(config, in_dim, out_dim, task, device):
             make_undirected=config.get('make_undirected', False),
             normalize_input=config.get('normalize_input', False),
             task=task,
+            use_embedding=config.get('use_embedding', False),
+            num_embeddings=config.get('num_embeddings', 28),
         )
     elif model_name == 'GHM':
         model = GHM(
@@ -150,6 +152,8 @@ def create_model(config, in_dim, out_dim, task, device):
             k_hop=config.get('k_hop', 2),
             normalize_input=config.get('normalize_input', False),
             task=task,
+            use_embedding=config.get('use_embedding', False),
+            num_embeddings=config.get('num_embeddings', 28),
         )
     elif model_name == 'GCN':
         model = GCN(

@@ -301,13 +301,19 @@ class GHC(nn.Module):
                  input_activation=False,
                  mean_agg=True, root_conn=True, residual=False,
                  add_self_loop=True, make_undirected=False,
-                 task='vertex', normalize_input=False):
+                 task='vertex', normalize_input=False,
+                 use_embedding=False, num_embeddings=28):
         super().__init__()
         self.add_self_loop = add_self_loop
         self.make_undirected = make_undirected
         self.task = task
         self.normalize_input = normalize_input
+        self.use_embedding = use_embedding
         self.input_dropout = nn.Dropout(input_dropout)
+        
+        if use_embedding:
+            self.embedding = nn.Embedding(num_embeddings, hidden_dim)
+            in_dim = hidden_dim
         
         if normalize_input:
             self.input_norm = nn.LayerNorm(in_dim)
@@ -327,6 +333,10 @@ class GHC(nn.Module):
         self.head = nn.Linear(hidden_dim, out_dim)
     
     def forward(self, x, edge_index, batch=None):
+        # Embedding for integer features (e.g., ZINC atom types)
+        if self.use_embedding:
+            x = self.embedding(x.squeeze(-1).long())
+        
         # Preprocess edges
         if self.make_undirected:
             edge_index = to_undirected(edge_index)
