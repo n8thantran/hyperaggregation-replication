@@ -1,0 +1,13 @@
+# Data directories (too large for GitHub)
+data/
+data_filtered/
+inductive/
+__pycache__/
+*.pyc
+*.pth
+*.pt
+*.pickle
+*.log
+
+# Keep results
+!results/
