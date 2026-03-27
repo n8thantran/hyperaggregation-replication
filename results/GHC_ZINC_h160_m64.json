@@ -1,0 +1,54 @@
+{
+  "test_mean": 0.44847230656941733,
+  "test_std": 0.02490431835939215,
+  "val_mean": 0.4218469416300456,
+  "val_std": 0.006230613326559038,
+  "all_results": [
+    {
+      "train": 0.295390288066864,
+      "val": 0.42738439178466797,
+      "test": 0.46623021697998046,
+      "epochs_trained": 382
+    },
+    {
+      "train": 0.3023420009613037,
+      "val": 0.42501398086547854,
+      "test": 0.4659340057373047,
+      "epochs_trained": 465
+    },
+    {
+      "train": 0.16734297366142273,
+      "val": 0.41314245223999024,
+      "test": 0.4132526969909668,
+      "epochs_trained": 500
+    }
+  ],
+  "config": {
+    "dataset": "ZINC",
+    "model": "GHC",
+    "task": "graph_regression",
+    "hidden_dim": 160,
+    "mix_dim": 64,
+    "num_blocks": 4,
+    "dropout": 0.0,
+    "mix_dropout": 0.0,
+    "mean_agg": true,
+    "root_conn": true,
+    "residual": true,
+    "trans_input": false,
+    "trans_output": true,
+    "add_self_loop": true,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "epochs": 500,
+    "patience": 100,
+    "batch_size": 128,
+    "use_embedding": true,
+    "num_embeddings": 28,
+    "use_scheduler": true,
+    "num_seeds": 3,
+    "num_splits": 1
+  },
+  "paper_target": "0.337 \u00b1 0.020",
+  "config_name": "h160_m64"
+}
